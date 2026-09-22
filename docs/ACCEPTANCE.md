@@ -34,12 +34,12 @@ Testnet evidence is detailed in [TESTNET_VERIFICATION.md](./TESTNET_VERIFICATION
   App-side gate: `verifyThresholdKey` rejects a mismatched expectation before `registerToken` is called (demonstrated in `demo-issue.ts`; the contract cannot read the mirror, so the app enforces it).
 - [x] **6. After 1 attester signature total supply is 0; after the 2nd it equals TOTAL_SHARES in the issuer treasury.**
   Schedule `0.0.10671514`: after 1 sig `executed_timestamp=null`, supply 0; after 2 sig executed, `total_supply=1000000`.
-- [x] **7. Each attestation appears on the asset's HCS topic** _(and on `/assets/[id]` — page pending)_.
-  Two `attested` messages logged to topic `0.0.10671502` with attester id + evidence hash.
+- [x] **7. Each attestation appears on the asset's HCS topic and on `/assets/[id]`.**
+  `attested` messages on topic `0.0.10671502`; `/assets/[id]` renders the HCS timeline (verified via `GET /api/assets/[id]`).
 - [x] **8. Lockup countdown shows after `confirmMint`; a KYC grant attempt during lockup reverts.**
-  `confirmMint` set status=Minted with a future `lockupEnds`; lockup-blocks-KYC proven by the increment-01 unit test.
+  `confirmMint` sets status=Minted with a future `lockupEnds` (shown on `/assets/[id]`); lockup-blocks-KYC proven by the increment-01 unit test.
 
-_Remaining 02: `/assets/new`, `/assets/[id]`, `/attest` pages; IPFS upload (pinning or local fallback); server routes wrapping the native ops._
+**UI + routes (verified via HTTP on testnet):** `/assets/new` → `POST /api/assets` issued asset #1 (token `0.0.10671876`); `/attest` "Act as" → `POST /api/assets/[id]/attest` ×2 → scheduled mint executed, `total_supply=1000000`; `/assets`, `/assets/[id]` list and render from the mirror. IPFS: local demo fallback verified (`pinned:false`); Pinata path via `IPFS_PINNING_JWT`. All routes 200 with no env; build clean.
 
 ## Increment 03 — KYC-gated market and guardian
 

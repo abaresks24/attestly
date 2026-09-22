@@ -32,6 +32,8 @@ End-to-end run: `yarn workspace @sh/hedera exec tsx src/demo-issue.ts` (asset #0
 | Mint at quorum | — | 1 sig → supply 0; 2 sig → executed, `total_supply=1000000` |
 | confirmMint (lockup) | — | status=Minted, `lockupEnds` in the future |
 
+**UI-route run** (`POST /api/assets` → `POST /api/assets/1/attest` ×2): asset #1, token `0.0.10671876`, schedule `0.0.10671880`, topic `0.0.10671874`. Two attester approvals via the route → schedule executed, `total_supply=1000000` to issuer treasury, kyc/pause key = registry, `admin_key: null`. Proves the issuance + attestation server routes end-to-end.
+
 ## Increment 03 — Market
 
 _(pending: pool creation, swap, pause, unpause)_
