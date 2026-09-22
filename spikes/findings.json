@@ -1,0 +1,259 @@
+{
+  "_meta": {
+    "purpose": "Reusable facts for the Attested RWA template, gathered from official sources during the feasibility phase. Values marked TBD_RUN are measured on-chain during spike execution.",
+    "gathered_at": "2026-09-22",
+    "status_legend": "SOURCED = from official docs/repo with URL; TBD_RUN = to be measured during spike execution; UNVERIFIED = not confirmable from an official source"
+  },
+
+  "network": {
+    "sdk": {
+      "package": "@hashgraph/sdk",
+      "latest_version": "2.81.0",
+      "client": "Client.forTestnet().setOperator(id, key)",
+      "ecdsa_operator_supported": true,
+      "ecdsa_key_load": "PrivateKey.fromStringECDSA(...)",
+      "source": "https://www.npmjs.com/package/@hashgraph/sdk , https://hedera.com/blog/get-started-with-javascript/"
+    },
+    "json_rpc_relay": {
+      "testnet_url": "https://testnet.hashio.io/api",
+      "chain_id": 296,
+      "chain_id_hex": "0x128",
+      "note": "Hashio is dev/test only; no numeric rate limit published (UNVERIFIED).",
+      "source": "https://docs.hedera.com/hedera/core-concepts/smart-contracts/json-rpc-relay"
+    },
+    "mirror_node": {
+      "testnet_base": "https://testnet.mirrornode.hedera.com/api/v1/",
+      "docs": "https://testnet.mirrornode.hedera.com/api/v1/docs/",
+      "propagation_delay_seconds": "2-10",
+      "endpoints": {
+        "token_info": "/tokens/{tokenId}",
+        "account_tokens": "/accounts/{id}/tokens",
+        "token_balances": "/tokens/{tokenId}/balances",
+        "schedule": "/schedules/{scheduleId}",
+        "account": "/accounts/{id}",
+        "contract_result": "/contracts/results/{txIdOrHash}",
+        "contract_result_actions": "/contracts/results/{txIdOrHash}/actions",
+        "exchange_rate": "/network/exchangerate"
+      },
+      "key_fields": ["admin_key", "supply_key", "kyc_key", "freeze_key", "wipe_key", "pause_key", "fee_schedule_key", "metadata_key"],
+      "key_object_shape": "{ \"_type\": <ECDSA_SECP256K1|ED25519|ProtobufEncoded>, \"key\": <hex> }",
+      "CRITICAL_threshold_key_opaque": "A ThresholdKey/KeyList returns _type=ProtobufEncoded with key=hex of the serialized protobuf Key message. The mirror node does NOT expand threshold or sub-keys into JSON. Must decode the protobuf (via SDK Key parsing) to verify threshold=2 over 3 attester keys.",
+      "kyc_status_values": ["NOT_APPLICABLE", "GRANTED", "REVOKED"],
+      "pause_status_values": ["PAUSED", "UNPAUSED", "NOT_APPLICABLE"],
+      "schedule_executed_field": "executed_timestamp (null until executed); signatories in signatures[]",
+      "action_failure_marker": "result_data_type REVERT/ERROR (vs OUTPUT); HTS precompile appears as 0.0.359 / 0x167",
+      "source": "live testnet responses + openapi.yml, verified 2026-09-22"
+    },
+    "hashscan": {
+      "testnet_base": "https://hashscan.io/testnet/",
+      "paths": {
+        "tx": "https://hashscan.io/testnet/tx/{transactionId}",
+        "token": "https://hashscan.io/testnet/token/{tokenId}",
+        "account": "https://hashscan.io/testnet/account/{accountId}",
+        "schedule": "https://hashscan.io/testnet/schedule/{scheduleId}",
+        "contract": "https://hashscan.io/testnet/contract/{contractId}"
+      }
+    },
+    "id_evm_conversion": {
+      "long_zero": "0.0.N -> 0x + 12 zero bytes + 8-byte big-endian entity num",
+      "ecdsa_alias": "rightmost 20 bytes of keccak256(secp256k1 pubkey)",
+      "sdk_helpers": ["AccountId.fromEvmAddress(shard,realm,addr)", "accountId.toSolidityAddress()", "AccountId.fromSolidityAddress()", "publicKey.toEvmAddress()"]
+    },
+    "faucet": {
+      "portal": "https://portal.hedera.com/faucet",
+      "authenticated_limit_per_24h": "1000 HBAR",
+      "anonymous_limit_per_24h": "100 HBAR",
+      "programmatic_api": "NONE - manual web UI only",
+      "source": "https://docs.hedera.com/hedera/tutorials/more-tutorials/create-and-fund-your-hedera-testnet-account"
+    }
+  },
+
+  "system_contracts": {
+    "_source_repo": "hiero-ledger/hiero-contracts",
+    "_pinned_commit": "5ade6c8c0ca2138f5bf669863f1be128e65c3d3b",
+    "_base_url": "https://github.com/hiero-ledger/hiero-contracts/blob/5ade6c8c0ca2138f5bf669863f1be128e65c3d3b/",
+    "hts": {
+      "address": "0x167",
+      "interface": "IHederaTokenService",
+      "file": "contracts/token-service/IHederaTokenService.sol",
+      "returns": "leading int64 responseCode; SUCCESS == 22; does NOT revert on business failure by default",
+      "signatures": {
+        "grantTokenKyc": "grantTokenKyc(address token, address account) returns (int64)",
+        "revokeTokenKyc": "revokeTokenKyc(address token, address account) returns (int64)",
+        "pauseToken": "pauseToken(address token) returns (int64)",
+        "unpauseToken": "unpauseToken(address token) returns (int64)",
+        "mintToken": "mintToken(address token, int64 amount, bytes[] metadata) returns (int64 responseCode, int64 newTotalSupply, int64[] serialNumbers)",
+        "associateToken": "associateToken(address account, address token) returns (int64)"
+      }
+    },
+    "hrc719_associate_facade": {
+      "file": "contracts/token-service/IHRC719.sol",
+      "note": "call on the token's own EVM address; returns uint256 responseCode",
+      "signatures": {
+        "associate": "associate() returns (uint256)",
+        "isAssociated": "isAssociated() returns (bool)"
+      }
+    },
+    "hss": {
+      "address": "0x16b",
+      "form_A_contract": {
+        "interface": "IHRC755",
+        "file": "contracts/schedule-service/IHRC755.sol",
+        "signatures": {
+          "authorizeSchedule": "authorizeSchedule(address schedule) returns (int64)",
+          "signSchedule": "signSchedule(address schedule, bytes signatureMap) returns (int64)"
+        },
+        "selectors": { "authorizeSchedule(address)": "0xf0637961", "signSchedule(address,bytes)": "0x358eeb03" }
+      },
+      "form_B_eoa_facade": {
+        "interface": "IHRC755ScheduleFacade",
+        "file": "contracts/schedule-service/IHRC755ScheduleFacade.sol",
+        "call_on": "the schedule's own long-zero EVM address",
+        "signature": "signSchedule() returns (int64)",
+        "selector": "0x06d15889",
+        "note": "This is the MetaMask/ethers EOA path (S3). The EOA's own tx signature IS the schedule signature. Not callable from within a contract.",
+        "test_ref": "test/schedule-service/hrc-755/HIP755.js lines 68-75",
+        "hip": "https://hips.hedera.com/hip/hip-755"
+      }
+    },
+    "response_codes": {
+      "SUCCESS": 22,
+      "INVALID_SIGNATURE": 7,
+      "INVALID_ACCOUNT_ID": 15,
+      "INVALID_TOKEN_ID": 167,
+      "ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN": 176,
+      "TOKEN_HAS_NO_KYC_KEY": 177,
+      "TOKEN_NOT_ASSOCIATED_TO_ACCOUNT": 184,
+      "TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT": 194,
+      "INVALID_SCHEDULE_ID": 201,
+      "SCHEDULE_ALREADY_EXECUTED": 213,
+      "TOKEN_IS_PAUSED": 265,
+      "TOKEN_HAS_NO_PAUSE_KEY": 266,
+      "_source": "contracts/common/HederaResponseCodes.sol @ pinned commit"
+    },
+    "delegatecall_issue": {
+      "tracker": "https://github.com/hiero-ledger/hiero-consensus-node/issues/27263",
+      "state": "open (observed 2026-09-12 testnet)",
+      "summary": "Calls into 0x16b from a DELEGATECALL frame (diamond/proxy) create schedules with a delegatable_contract_id admin key; scheduled execution fails INVALID_PAYER_SIGNATURE. Call 0x16b/0x167 from a DIRECT CALL frame only. Confirms the PRD 'no proxy/diamond' invariant."
+    }
+  },
+
+  "hip_423_long_term_schedule": {
+    "expiration_time": "optional Timestamp on ScheduleCreate; defaults to 30 min after consensus if unset",
+    "max_expiry": "~2 months (config scheduling.maxExpirationFutureSeconds); exact testnet numeric value UNVERIFIED - to confirm at run",
+    "wait_for_expiry": "optional bool, defaults false; when false, executes immediately once enough signatures arrive",
+    "errors": ["SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE", "SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME"],
+    "source": "https://github.com/hiero-ledger/hiero-improvement-proposals/blob/main/HIP/hip-423.md"
+  },
+
+  "saucerswap": {
+    "_source": "https://docs.saucerswap.finance/developerx/contract-deployments",
+    "_evm_addresses_note": "Docs publish only Hedera 0.0.x IDs; derive EVM 0x from mirror node evm_address field.",
+    "v2_testnet": {
+      "Factory": "0.0.1197038",
+      "NonfungiblePositionManager": "0.0.1308184",
+      "SwapRouter": "0.0.1414040",
+      "QuoterV2": "0.0.1390002",
+      "WHBAR_contract": "0.0.15057",
+      "WHBAR_token": "0.0.15058",
+      "WhbarHelper": "0.0.5286055",
+      "SAUCE_token": "0.0.1183558"
+    },
+    "v1_testnet_fallback": {
+      "Factory": "0.0.9959",
+      "RouterV3": "0.0.19264"
+    },
+    "fee_tiers": [500, 1500, 3000, 10000],
+    "fee_tiers_note": "0.05% / 0.15% / 0.30% / 1.00% - FOUR tiers (extra 0.15% vs stock Uniswap V3)",
+    "pool_creation": {
+      "method": "NonfungiblePositionManager.mint(MintParams) payable - pool init folded into first mint; no standalone create call documented",
+      "fee": "DYNAMIC: Factory.mintFee() returns tinycents; convert via mirror /network/exchangerate; pay as msg.value (setPayableAmount). No fixed testnet HBAR constant (UNVERIFIED by design).",
+      "mint_params": "struct { address token0; address token1; uint24 fee; int24 tickLower; int24 tickUpper; uint256 amount0Desired; uint256 amount1Desired; uint256 amount0Min; uint256 amount1Min; address recipient; uint256 deadline; }"
+    },
+    "liquidity": {
+      "hbar_handling": "native HBAR NOT accepted directly; pass WHBAR token id + HBAR via setPayableAmount; recipient must associate the LP NFT id",
+      "approvals": "PositionManager needs AccountAllowanceApprove for input HTS tokens"
+    },
+    "swap": {
+      "methods_documented": ["exactInput(ExactInputParams)", "exactOutput"],
+      "single_variants": "exactInputSingle NOT documented for SaucerSwap (UNVERIFIED)",
+      "exact_input_params": "struct { bytes path; address recipient; uint256 deadline; uint256 amountIn; uint256 amountOutMinimum; }",
+      "path_encoding": "token(20B) + fee(3B) + token(20B) ...",
+      "hbar_in": "set HBAR as msg.value via setPayableAmount; WHBAR as first path token",
+      "hbar_out": "multicall(exactInput + unwrapWHBAR)"
+    },
+    "quoter": {
+      "method": "QuoterV2.quoteExactInput(path, amountIn) - read-only, on-chain (no REST needed)"
+    },
+    "rest_api": {
+      "testnet_base": "https://test-api.saucerswap.finance",
+      "api_key": "REQUIRED via x-api-key header; request by emailing support@saucerswap.finance",
+      "pool_endpoints": ["/pools-v2", "/pools-v2/positions", "/tokens"],
+      "quote_endpoint": "NONE for V2 swaps - use on-chain QuoterV2"
+    },
+    "custom_fee_and_kyc": {
+      "custom_fee_tokens": "V2 does NOT support custom-fee tokens (FAQ). V1 supports fractional-fee-with-net-disabled only.",
+      "kyc_key_tokens": "UNVERIFIED in docs - no statement. THIS IS THE S1 RISK: every pool/router/position-manager contract account would need KYC granted; no documented SaucerSwap mechanism for it.",
+      "faq": "https://docs.saucerswap.finance/get-started/faq"
+    }
+  },
+
+  "template_json": {
+    "cli_command": "npm create scaffold-hbar@latest  (== npx create-scaffold-hbar@latest)",
+    "template_arg_forms": ["<builtin-key>", "org/repo", "org/repo#branch"],
+    "local_path_support": "NOT documented; giget git:./path unconfirmed (UNVERIFIED) -> gate-check likely needs a public/private GitHub branch",
+    "repo_root_file": "template.json at repo root; CLI strips it from generated project after reading",
+    "top_level": { "name": "string (optional)", "description": "string (optional)", "version": "string (optional)", "create-scaffold-hbar": "object (the manifest the CLI reads)" },
+    "manifest": {
+      "capabilities": { "frontend": ["nextjs-app"], "solidityFramework": ["foundry", "hardhat", "none"], "packageManager": ["yarn", "npm"] },
+      "defaults": { "frontend": "nextjs-app", "solidityFramework": "hardhat", "packageManager": "yarn" },
+      "outro": { "installCommand": "optional string", "sections": "[{ title?, steps: [{ label?, command?, url?, text? }] }]", "steps": "deprecated flat form" }
+    },
+    "placeholder_tokens": { "{run:script}": "pm run script", "{run:framework:script}": "e.g. yarn hardhat:deploy", "{pm}": "yarn|npm|pnpm" },
+    "required_files_for_gate": ["template.json", "README.md", "AGENTS.md", "LICENSE (MIT)", "no committed .env/secrets"],
+    "caveats": [
+      "CLI TEMPLATE_REPO points at buidler-labs/scaffold-hbar for builtin keys; community templates load org/repo#ref directly via giget",
+      "CLI README says npm/pnpm 'not supported' but registry + rewrite logic support npm - contradictory; yarn@3.2.3 is the safe default",
+      "--package-manager flag used in examples but absent from official flag table (UNVERIFIED)"
+    ],
+    "sources": ["https://github.com/hedera-dev/scaffold-hbar", "https://github.com/hedera-dev/create-scaffold-hbar", "https://docs.hedera.com/solutions/tools/scaffold-hbar/index"]
+  },
+
+  "scaffold_tooling": {
+    "node": ">=20.18.3",
+    "package_manager": "yarn@3.2.3 (workspaces via corepack)",
+    "packages": ["packages/hardhat", "packages/nextjs", "packages/foundry"],
+    "nextjs": { "next": "^15.2.8", "react": "^19.2.3", "rainbowkit": "2.2.9", "wagmi": "2.19.5", "viem": "2.39.0", "hedera_sdk": "@hiero-ledger/sdk ^2.80.0", "daisyui": "^5.0.9", "typescript": "^5.8.2", "tailwindcss": "^4.1.3", "eslint": "^9.23.0" },
+    "hardhat": { "hardhat": "2.22.19", "hardhat-deploy": "^1.0.4", "ethers": "^6.14.0", "typescript": "^5.8.2" },
+    "harness": "hedera-harness 1.1.2 (when .harness/ recipes used)"
+  },
+
+  "bounty": {
+    "brief": "https://hedera.com/blog/scaffold-hbar-template-bounty/",
+    "rubric": { "ecosystem": 35, "docs": 30, "code": 20, "hedera_depth": 15 },
+    "eligibility_gate": [
+      "scaffolds cleanly via npm create scaffold-hbar@latest --template owner/repo",
+      "template.json present and valid",
+      "README.md and AGENTS.md present",
+      "install/lint/build pass clean from fresh scaffold",
+      "app boots and core routes return OK",
+      ">=1 Hedera service with a verifiable testnet tx + mirror/hashscan link",
+      "no committed secrets/.env",
+      "MIT, original work",
+      "harness spec + validators submitted if harness used"
+    ],
+    "deadline": "Oct 4, 2026 23:59 ET",
+    "prizes": "5 x $2000",
+    "self_check_script": "Hedera publishes an eligibility self-check script the week before the build window"
+  },
+
+  "measured_on_chain": {
+    "_note": "Filled during spike runs. TBD_RUN until then.",
+    "operator_account": "TBD_RUN",
+    "test_accounts": "TBD_RUN (spikes/.keys.json)",
+    "s2_threshold_mint": { "long_expiry_accepted": "TBD_RUN", "mint_executes_at_kth_sig": "TBD_RUN", "larger_committee_sizes": "TBD_RUN" },
+    "s4_contract_keys": { "grant_kyc_gas": "TBD_RUN", "pause_gas": "TBD_RUN", "outsider_transfer_code": "TBD_RUN (expect 176)", "paused_transfer_code": "TBD_RUN (expect 265)" },
+    "s3_hip755": { "eoa_sign_works": "TBD_RUN", "call_form_used": "TBD_RUN" },
+    "s1_saucerswap": { "pool_created": "TBD_RUN", "minimal_kyc_contract_set": "TBD_RUN", "investor_swap_verified": "TBD_RUN", "outsider_refused_code": "TBD_RUN", "v1_fallback_needed": "TBD_RUN" }
+  }
+}

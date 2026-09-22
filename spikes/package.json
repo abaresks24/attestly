@@ -1,0 +1,27 @@
+{
+  "name": "attested-rwa-spikes",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Throwaway feasibility spikes for the Attested RWA scaffold-hbar template. Not shipped in the template.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "accounts": "tsx setup-accounts.ts",
+    "s2": "tsx s2-threshold-mint.ts",
+    "s4": "tsx s4-contract-keys.ts",
+    "s3": "tsx s3-hip755-sign.ts",
+    "s1": "tsx s1-saucerswap-kyc.ts"
+  },
+  "dependencies": {
+    "@hashgraph/sdk": "^2.81.0",
+    "@hiero-ledger/proto": "2.26.0-beta.3",
+    "dotenv": "^16.6.1",
+    "ethers": "^6.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "solc": "^0.8.24",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}
