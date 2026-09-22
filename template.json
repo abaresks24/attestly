@@ -1,0 +1,36 @@
+{
+  "name": "attested-rwa",
+  "description": "Issue a real-world asset token the network refuses to mint until a quorum of independent attesters signs, then trade it on a KYC-gated SaucerSwap pool.",
+  "version": "0.1.0",
+  "create-scaffold-hbar": {
+    "capabilities": {
+      "frontend": ["nextjs-app"],
+      "solidityFramework": ["hardhat"]
+    },
+    "defaults": {
+      "frontend": "nextjs-app",
+      "solidityFramework": "hardhat"
+    },
+    "outro": {
+      "sections": [
+        {
+          "steps": [
+            {
+              "text": "Attested RWA: the token's supply key is a native ThresholdKey of attester keys, its KYC and pause keys are the AssetRegistry contract, and it trades on a KYC-gated SaucerSwap pool. Runs on Hedera testnet."
+            }
+          ]
+        },
+        {
+          "title": "Suggested steps",
+          "steps": [
+            { "label": "Create a funded testnet account (ECDSA)", "url": "https://portal.hedera.com" },
+            { "label": "Configure the operator", "text": "copy .env.example to packages/hardhat/.env and packages/nextjs/.env.local, then fill in OPERATOR_ID / OPERATOR_KEY" },
+            { "label": "Seed the demo actors (issuer, attesters, guardian, investors)", "command": "{run:seed:demo}" },
+            { "label": "Deploy the contracts to Hedera testnet", "command": "{run:deploy:testnet}" },
+            { "label": "Start the app", "command": "{run:next:dev}" }
+          ]
+        }
+      ]
+    }
+  }
+}

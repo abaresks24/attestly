@@ -48,12 +48,18 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: {
-      forking: {
-        url: hederaRpcUrl,
-        // @ts-expect-error - custom property for hedera-forking plugin
-        chainId: 296,
-        workerPort: 10001,
-      },
+      // Fork testnet only when explicitly requested (yarn hardhat:chain / :fork). Unit tests use a
+      // mock HTS precompile, so they run on an isolated in-memory network — faster and deterministic.
+      ...(process.env.HEDERA_FORKING === "true"
+        ? {
+            forking: {
+              url: hederaRpcUrl,
+              // @ts-expect-error - custom property for hedera-forking plugin
+              chainId: 296,
+              workerPort: 10001,
+            },
+          }
+        : {}),
     },
     hederaTestnet: {
       url: "https://testnet.hashio.io/api",

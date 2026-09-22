@@ -3,13 +3,14 @@ import type { DeployFunction } from "hardhat-deploy/types";
 
 import { getDeployGasPrice } from "../utils/getDeployGasPrice";
 
-const deployHtsTokenCreator: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+/// InvestorRegistry: the deployer becomes the admin who approves verified investors.
+const deployInvestorRegistry: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
-  await deploy("HtsTokenCreator", {
+  await deploy("InvestorRegistry", {
     from: deployer,
-    args: [],
+    args: [deployer],
     log: true,
     autoMine: true,
     gasLimit: "3000000",
@@ -17,6 +18,5 @@ const deployHtsTokenCreator: DeployFunction = async function (hre: HardhatRuntim
   });
 };
 
-deployHtsTokenCreator.tags = ["HtsTokenCreator"];
-deployHtsTokenCreator.dependencies = ["HederaToken"];
-export default deployHtsTokenCreator;
+deployInvestorRegistry.tags = ["InvestorRegistry"];
+export default deployInvestorRegistry;

@@ -52,4 +52,20 @@ interface IHederaTokenService {
         int64 amount,
         bytes[] memory metadata
     ) external returns (int64 responseCode, int64 newTotalSupply, int64[] memory serialNumbers);
+
+    /// Grants KYC to an account for a token. Caller must hold the token's KYC key.
+    /// @return responseCode SUCCESS is 22.
+    function grantTokenKyc(address token, address account) external returns (int64 responseCode);
+
+    /// Revokes KYC from an account for a token. Caller must hold the token's KYC key.
+    function revokeTokenKyc(address token, address account) external returns (int64 responseCode);
+
+    /// Pauses a token. Caller must hold the token's pause key.
+    function pauseToken(address token) external returns (int64 responseCode);
+
+    /// Unpauses a token. Caller must hold the token's pause key.
+    function unpauseToken(address token) external returns (int64 responseCode);
+
+    /// Associates the calling contract account with a token (required before it can hold/KYC it).
+    function associateToken(address account, address token) external returns (int64 responseCode);
 }
