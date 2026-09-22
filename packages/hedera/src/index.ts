@@ -10,5 +10,7 @@ export * from "./issuance.js";
 export * from "./registry.js";
 export * from "./ipfs.js";
 export * from "./flows.js";
+export * from "./market.js";
+export * from "./deployed.js";
 export * from "./attesters/index.js";
 export * from "./errors.js";

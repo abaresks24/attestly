@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-hbar/contract";
 const deployedContracts = {
   296: {
     AssetRegistry: {
-      address: "0x3F536A2a22fF1D99F6b08b72FE4A9aDE8DC07652",
+      address: "0xB461DD05E0E5C803ac11110E51A9DdCAd0c0Ab62",
       abi: [
         {
           inputs: [
@@ -563,10 +563,10 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 40855983,
+      deployedOnBlock: 40858054,
     },
     InvestorRegistry: {
-      address: "0xDA604dD18c0dC46ee09CBD20cECdEc51d87Cd36f",
+      address: "0xbcB2237B6FB03390bDEC0b0A58998472563fE48b",
       abi: [
         {
           inputs: [
@@ -707,7 +707,7 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-      deployedOnBlock: 40855979,
+      deployedOnBlock: 40858051,
     },
   },
 } as const;

@@ -8,7 +8,8 @@ export const rwaConfig = {
   /// Signatures required to mint (the k in ThresholdKey(k of n)).
   threshold: 2,
   /// Seconds shares stay locked in the treasury after mint before finalize can open trading.
-  lockupPeriodSeconds: 10 * 60, // 10 min
+  /// Kept short so the demo (and "Run the full story") complete in one sitting; raise for production.
+  lockupPeriodSeconds: 120, // 2 min (demo)
   /// Long-term expiry (HIP-423) of the scheduled mint that collects attester signatures.
   scheduleExpirySeconds: 24 * 60 * 60, // 24 h
   /// Emergency guardian: a native ThresholdKey(threshold of members) account, not a multisig contract.
