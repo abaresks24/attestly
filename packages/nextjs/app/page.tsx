@@ -2,161 +2,113 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { HederaPortalFaucet } from "@scaffold-hbar-ui/components";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
-import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { HederaAddress } from "~~/components/scaffold-hbar";
-import { useTargetNetwork } from "~~/hooks/scaffold-hbar";
+
+// The demo walkthrough: each step links to the page that performs it. Reads left-to-right as the
+// lifecycle a real-world asset goes through — submit, attest to quorum, mint, open a KYC-gated
+// market, and (if needed) hit the guardian emergency stop.
+const STORY: { n: number; title: string; body: string; href: string; cta: string }[] = [
+  {
+    n: 1,
+    title: "Submit the asset",
+    body: "Upload the document (IPFS), register CID + SHA-256, and open a per-asset HCS audit topic.",
+    href: "/assets/new",
+    cta: "Submit an asset",
+  },
+  {
+    n: 2,
+    title: "Attest to quorum",
+    body: "Each attester approves and signs the scheduled mint. The network mints only at the k-th signature — no Solidity enforces it.",
+    href: "/attest",
+    cta: "Open the attester queue",
+  },
+  {
+    n: 3,
+    title: "Mint & lock up",
+    body: "At quorum the token mints to the issuer. Confirm the mint to start the lockup; shares can't leave the treasury yet.",
+    href: "/assets",
+    cta: "View assets",
+  },
+  {
+    n: 4,
+    title: "Open the KYC-gated market",
+    body: "After lockup: create the SaucerSwap V1 pair, grant it KYC, add liquidity, verify an investor, and swap. Unverified accounts are refused by the network.",
+    href: "/assets",
+    cta: "Go to an asset's market",
+  },
+  {
+    n: 5,
+    title: "Guardian emergency stop",
+    body: "A native ThresholdKey(2-of-3) account pauses the token. One signature fails; two succeed. Swaps then fail with a plain explanation until unpause.",
+    href: "/assets",
+    cta: "Try pause / unpause",
+  },
+];
 
 const Home: NextPage = () => {
-  const { address: connectedAddress, status } = useAccount();
-  const { targetNetwork } = useTargetNetwork();
-
-  const isReconnecting = status === "reconnecting" || status === "connecting";
-  const isConnected = status === "connected" && connectedAddress;
-
   return (
-    <>
-      <div className="flex items-center flex-col grow">
-        <div className="hedera-gradient dark:bg-none dark:bg-hedera-charcoal w-full py-16 px-5">
-          <div className="flex flex-col items-center max-w-2xl mx-auto">
-            <Image
-              src="/Hedera-Icon-White.svg"
-              alt="Hedera icon"
-              width={80}
-              height={80}
-              className="mb-6 hidden dark:block"
-            />
-            <Image src="/Hedera-Icon-Dark.svg" alt="Hedera icon" width={80} height={80} className="mb-6 dark:hidden" />
-            <div className="flex flex-col items-center gap-1 mb-4">
-              <span className="block text-lg font-medium tracking-widest uppercase text-white/80 dark:text-white/60">
-                Built on Hedera
-              </span>
-              <span className="block text-lg font-medium tracking-widest uppercase text-white/80 dark:text-white/60">
-                For
-              </span>
-              <Image
-                src="/Hedera-Wordmark-Lockup-White.svg"
-                alt="Hedera"
-                width={240}
-                height={48}
-                className="mt-1 hidden dark:block"
-              />
-              <Image
-                src="/Hedera-Wordmark-Lockup-Dark.svg"
-                alt="Hedera"
-                width={240}
-                height={48}
-                className="mt-1 dark:hidden"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="w-full max-w-4xl mx-auto px-5 -mt-8">
-          <div className="bg-base-100 rounded-2xl shadow-lg p-8">
-            {isReconnecting ? (
-              <div className="flex flex-col items-center gap-2">
-                <p className="font-semibold text-sm text-base-content/60 uppercase tracking-wider m-0">Connecting…</p>
-                <div className="h-8 w-48 rounded bg-base-200 animate-pulse" aria-hidden />
-              </div>
-            ) : isConnected ? (
-              <div className="flex flex-col items-center gap-2">
-                <p className="font-semibold text-sm text-base-content/60 uppercase tracking-wider m-0">
-                  Connected Address
-                </p>
-                <HederaAddress address={connectedAddress} chain={targetNetwork} />
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-2">
-                <p className="font-semibold text-sm text-base-content/60 uppercase tracking-wider m-0">
-                  Connect your wallet to get started
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="w-full max-w-4xl mx-auto px-5 mt-8 pb-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-base-100 rounded-2xl shadow-md p-8 text-center flex flex-col items-center hover:shadow-lg transition-shadow border border-base-300">
-              <div className="w-14 h-14 rounded-full hedera-gradient flex items-center justify-center mb-4">
-                <BugAntIcon className="h-7 w-7 text-white" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Debug Contracts</h3>
-              <p className="text-base-content/70 text-sm m-0 mb-6">
-                Tinker with your smart contracts and test interactions in real time.
-              </p>
-              <Link href="/debug" passHref className="btn btn-primary btn-sm">
-                Open Debug
-              </Link>
-            </div>
-
-            <div className="bg-base-100 rounded-2xl shadow-md p-8 text-center flex flex-col items-center border border-base-300 relative">
-              <div className="w-14 h-14 rounded-full hedera-gradient flex items-center justify-center mb-4">
-                <MagnifyingGlassIcon className="h-7 w-7 text-white" />
-              </div>
-              <h3 className="font-bold text-lg mb-2">Block Explorer</h3>
-              <p className="text-base-content/70 text-sm m-0 mb-6">
-                Explore transactions, addresses, and contract activity on Hedera.
-              </p>
-              <Link href="/blockexplorer" passHref className="btn btn-primary btn-sm">
-                Open Block Explorer
-              </Link>
-            </div>
-          </div>
-
-          <div className="mt-8 bg-base-100 rounded-2xl shadow-md p-8 border border-base-300">
-            <h3 className="font-bold text-lg mb-4 text-center">Quick Start</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="flex items-start gap-3">
-                <span className="font-bold text-primary text-lg leading-none mt-0.5">1</span>
-                <div>
-                  <p className="m-0 font-medium">Edit the frontend</p>
-                  <code className="text-xs bg-base-200 px-2 py-1 rounded">packages/nextjs/app/page.tsx</code>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="font-bold text-primary text-lg leading-none mt-0.5">2</span>
-                <div>
-                  <p className="m-0 font-medium">Edit your contract</p>
-                  <div className="flex flex-col gap-1">
-                    <code className="text-xs bg-base-200 px-2 py-1 rounded">
-                      packages/hardhat/contracts/HederaToken.sol
-                    </code>
-                    <code className="text-xs bg-base-200 px-2 py-1 rounded">
-                      packages/foundry/contracts/HederaToken.sol
-                    </code>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="font-bold text-primary text-lg leading-none mt-0.5">3</span>
-                <div>
-                  <p className="m-0 font-medium">Get testnet HBAR</p>
-                  <HederaPortalFaucet variant="link" label="portal.hedera.com/faucet" showIcon={false} />
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="font-bold text-primary text-lg leading-none mt-0.5">4</span>
-                <div>
-                  <p className="m-0 font-medium">Deploy to Hedera</p>
-                  <div className="flex flex-col gap-1">
-                    <code className="text-xs bg-base-200 px-2 py-1 rounded">
-                      yarn hardhat:deploy --network hederaTestnet
-                    </code>
-                    <code className="text-xs bg-base-200 px-2 py-1 rounded">
-                      yarn foundry:deploy --network hedera_testnet
-                    </code>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="flex items-center flex-col grow">
+      <div className="hedera-gradient dark:bg-none dark:bg-hedera-charcoal w-full py-14 px-5">
+        <div className="flex flex-col items-center max-w-2xl mx-auto text-center">
+          <Image
+            src="/Hedera-Icon-White.svg"
+            alt="Hedera icon"
+            width={64}
+            height={64}
+            className="mb-5 hidden dark:block"
+          />
+          <Image src="/Hedera-Icon-Dark.svg" alt="Hedera icon" width={64} height={64} className="mb-5 dark:hidden" />
+          <h1 className="text-3xl md:text-4xl font-bold text-white m-0">Attested RWA</h1>
+          <p className="text-white/80 mt-3 mb-0 max-w-xl">
+            Issue a real-world-asset token the network refuses to mint until a quorum of attesters signs — then trade it
+            on a KYC-gated SaucerSwap pool. Every step is on an HCS audit trail.
+          </p>
         </div>
       </div>
-    </>
+
+      <div className="w-full max-w-3xl mx-auto px-5 -mt-6 pb-16">
+        <div className="bg-base-100 rounded-2xl shadow-lg p-6 md:p-8 border border-base-300">
+          <h2 className="text-xl font-bold mb-1">Run the full story</h2>
+          <p className="text-base-content/70 text-sm mb-6">
+            Seed the demo (<code>yarn seed:demo</code>) and set your operator, then walk the five steps. Each links to
+            the page that performs it; on-chain effects are linked to HashScan from the asset page.
+          </p>
+
+          <ol className="space-y-4">
+            {STORY.map(step => (
+              <li key={step.n} className="flex items-start gap-4">
+                <span className="w-8 h-8 shrink-0 rounded-full hedera-gradient text-white flex items-center justify-center font-bold">
+                  {step.n}
+                </span>
+                <div className="grow">
+                  <h3 className="font-semibold m-0">{step.title}</h3>
+                  <p className="text-sm text-base-content/70 m-0 mt-0.5 mb-2">{step.body}</p>
+                  <Link href={step.href} className="btn btn-xs btn-primary">
+                    {step.cta} →
+                  </Link>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+          <Link href="/assets" className="btn btn-outline">
+            Assets
+          </Link>
+          <Link href="/debug" className="btn btn-outline">
+            Debug Contracts
+          </Link>
+          <Link href="/blockexplorer" className="btn btn-outline">
+            Block Explorer
+          </Link>
+        </div>
+
+        <p className="text-xs text-base-content/50 text-center mt-6">
+          Testnet demo. The token carries no legal title to any asset. See the README disclaimer.
+        </p>
+      </div>
+    </div>
   );
 };
 

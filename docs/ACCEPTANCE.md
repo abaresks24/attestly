@@ -56,4 +56,26 @@ routes, each verified over HTTP against the running app (see TESTNET_VERIFICATIO
 
 ## Increment 04 — Documentation and polish
 
-_(pending)_
+- [x] **1. All previous acceptance passes from a fresh scaffold.** `scripts/gate-check.sh` runs the
+  offline gate with no `.env` and is **GREEN**: secrets gitignored, `yarn install --immutable`, lint,
+  type-check (hedera/nextjs/hardhat), `hardhat:compile`, contract tests, adapter tests, `next:build`.
+  On-chain acceptance is proven separately on testnet (increments 01–03 above).
+- [x] **2. A developer with no context reaches a running app using only the README.** README has a
+  60-second quickstart (install → env → `deploy:testnet` → `seed:demo` → `next:dev`), prerequisites,
+  and an env table; the home page then guides the five-step story.
+- [x] **3. README contains every scope section; Mermaid renders.** Problem, quickstart, prerequisites,
+  env table, Mermaid architecture (`flowchart`), Why Hedera, "Who are the attesters?" (8 asset types),
+  rubric, trust assumptions, disclaimer, Going further → PROTOCOL_VISION.
+- [x] **4. TESTNET_VERIFICATION.md links every on-chain step.** deploy, seed (guardian ThresholdKey),
+  submission (HCS), token creation (key set), each schedule signature (1→supply 0, 2→executed), mint,
+  finalize (KYC to pair), pool creation, swap, pause, unpause — with HashScan links / mirror proofs.
+- [x] **5. ADAPTING.md shows, with file paths, how to swap the attester, the asset metadata, and the
+  trading pair.** `attesters/types.ts` + `manual.ts`/`mockRegistry.ts`; `config/rwa.ts` + `flows.ts`;
+  `constants.ts` + `market.ts` + `errors.ts`.
+- [x] **6. No TODO, debug logging or unused exports in shipped code.** No TODO/FIXME in sources; the
+  only `console.*` in app code is `console.error` in route catch blocks (CLI `seed.ts`/`demo-*.ts` log
+  intentionally); duplicate `LICENCE` removed; the unused `isInvestorVerified` export was dropped.
+
+**Polish:** `/` rewritten as the "Run the full story" guided demo; `README.md`, `AGENTS.md`,
+`docs/ARCHITECTURE.md`, `docs/ADAPTING.md` written for the shipped template; `scripts/gate-check.sh`
+added.

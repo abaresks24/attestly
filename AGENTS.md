@@ -1,122 +1,100 @@
 # Agent instructions
 
-Briefing for coding agents in this app (Cursor, Claude Code, Codex). Claude Code loads it through `CLAUDE.md`.
+Briefing for coding agents (Cursor, Claude Code, Codex) working in the **Attested RWA** template.
+Claude Code loads this through `CLAUDE.md`. For the product overview read [README.md](README.md); for
+how the pieces fit, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); to change behavior,
+[docs/ADAPTING.md](docs/ADAPTING.md).
 
-This is a Scaffold-HBAR dApp: Next.js App Router, wallet connect, Debug Contracts, and Hedera networks (testnet, mainnet, local fork). The CLI may have left only Hardhat or only Foundry.
+This is a Scaffold-HBAR dApp pruned to **Hardhat + Next.js + a shared `@sh/hedera` package** (no
+Foundry). Package manager is **Yarn 3** (`packageManager` in the root `package.json`). Examples use
+`yarn`.
 
-Use the package manager this project was created with (`packageManager` in the root `package.json`, or the lockfile). Examples use `yarn`; if the app was created with npm, swap `yarn <script>` for `npm run <script>`.
+## Repo map
 
-## Which Solidity package
+```
+packages/hardhat/   AssetRegistry.sol, InvestorRegistry.sol, interfaces/, test/, deploy/, config/rwa.ts
+packages/nextjs/    App Router UI + /app/api server routes (Node runtime) for native HAPI ops
+packages/hedera/    @sh/hedera — client, mirror, keys, schedules, market, errors, attesters/, demo-*.ts
+mock-registry/      titles.json for the demo MockRegistryAttester
+docs/               ARCHITECTURE, ADAPTING, ACCEPTANCE, TESTNET_VERIFICATION, BUILD_PLAN, PROTOCOL_VISION
+scripts/gate-check.sh   offline eligibility gate (install, lint, types, tests, build)
+```
 
-- `packages/hardhat` exists → Hardhat (`hardhat-deploy`)
-- `packages/foundry` exists → Foundry (Forge scripts)
-- `packages/nextjs` is always the frontend (App Router, RainbowKit, Wagmi, Viem, DaisyUI)
+## Invariants — do not break these
 
-Follow only the flavor that is present.
+These are the reason the template exists. Changing them changes the security model.
+
+1. **Token key set (FR-2).** Tokens are created with: supply key = `ThresholdKey(k of n)` over the
+   attester keys; KYC key = pause key = the `AssetRegistry` contract; **no admin key** (immutable).
+   The app verifies this on the mirror (`verifyThresholdKey`, `packages/hedera/src/keys.ts`) **before**
+   `registerToken`. Never register a token whose keys don't match.
+2. **Quorum is enforced by the network, not Solidity.** The scheduled `TokenMint` executes at the
+   k-th signature. Don't add a contract that mints directly.
+3. **Lockup.** `AssetRegistry` refuses to grant KYC until `finalize`, after `lockupPeriodSeconds`.
+4. **Guardian is a native `ThresholdKey(2/3)` account**, not a multisig contract. Pause/unpause is a
+   `ContractExecuteTransaction` signed by the member keys (`guardianSetPause`).
+5. **No proxies.** Schedules booked from a `DELEGATECALL` frame hit a testnet issue; deploy the
+   registry directly.
+6. **Graceful degradation.** The app boots with no env; every route returns 200. Keep it that way.
 
 ## Commands
 
-Package-prefixed scripts for package-specific work. Keep only truly cross-workspace commands unprefixed.
-
 ```bash
-# Local chain + deploy + frontend (separate terminals)
-yarn hardhat:chain    # Hedera-forked Hardhat node on 8545
-yarn hardhat:deploy --network localhost
-yarn foundry:chain    # Anvil from the Foundry package
-yarn foundry:deploy
-yarn next:start       # http://localhost:3000
+yarn install
+yarn deploy:testnet          # deploy AssetRegistry + InvestorRegistry to hederaTestnet
+yarn seed:demo               # issuer, 3 attesters, guardian 2/3, 2 investors -> gitignored .demo-keys.json
+yarn next:dev                # http://localhost:3000
 
-# Frontend only
-yarn next:dev
-
-# Quality / build
+# Quality (also what scripts/gate-check.sh runs)
 yarn lint
 yarn format
-yarn next:build
 yarn hardhat:compile
-yarn foundry:compile
+yarn hardhat:test            # contract unit tests
+yarn workspace @sh/hedera test   # attester adapter tests
+yarn next:build
 
-# Live networks
-yarn hardhat:deploy --network hederaTestnet   # or hederaMainnet
-yarn foundry:deploy --network hedera_testnet  # or hedera_mainnet
-yarn hardhat:verify:testnet
-yarn foundry:verify:testnet
+# On-chain end-to-end proofs (need operator env + seeded demo)
+yarn workspace @sh/hedera exec tsx src/demo-issue.ts
+yarn workspace @sh/hedera exec tsx src/demo-market.ts
+yarn workspace @sh/hedera exec tsx src/demo-guardian.ts <assetId> <tokenId>
 
 # Deployer account
-yarn hardhat:account:generate
-yarn hardhat:account:import
-yarn hardhat:account
+yarn hardhat:account:generate | :import | :account
 ```
 
-`yarn hardhat:deploy` without `--network localhost` targets the in-process `hardhat` network, not the long-running fork.
+After deploy, ABIs + addresses are written to `packages/nextjs/contracts/deployedContracts.ts`.
+Redeploy fresh: `__RUNTIME_DEPLOYER_PRIVATE_KEY=<key> yarn workspace @sh/hardhat exec hardhat deploy --network hederaTestnet --reset`.
 
-## Layout
+## How to change things (see ADAPTING.md for full detail)
 
-### Hardhat
-
-- Contracts: `packages/hardhat/contracts/`
-- Deploy scripts: `packages/hardhat/deploy/`
-- Tests: `packages/hardhat/test/`
-- Config: `packages/hardhat/hardhat.config.ts`
-- Tagged deploy: if `deployHederaToken.tags = ["HederaToken"]`, run `yarn hardhat:deploy --tags HederaToken`
-
-### Foundry
-
-- Contracts: `packages/foundry/contracts/`
-- Deploy scripts: `packages/foundry/script/` (`Deploy.s.sol`, `DeployHederaToken.s.sol`, `DeployHtsTokenCreator.s.sol`)
-- Tests: `packages/foundry/test/`
-- Config: `packages/foundry/foundry.toml`
-- One contract: `yarn foundry:deploy --file DeployHederaToken.s.sol`
-
-### After deploy
-
-ABIs and addresses are written to `packages/nextjs/contracts/deployedContracts.ts`. Put third-party contracts in `packages/nextjs/contracts/externalContracts.ts`.
-
-Sample contracts on this starter: `HederaToken` (ERC-20) and `HtsTokenCreator` (HTS precompile at `0x167`).
+- **Add an attester:** implement `Attester` in a new file under `packages/hedera/src/attesters/`,
+  export it from `index.ts`, add a test. The demo adapters are `manual.ts` and `mockRegistry.ts`.
+- **Change a parameter** (committee size, quorum, lockup, shares): `packages/hardhat/config/rwa.ts`
+  (mirrored in `template.json`).
+- **Change the asset type:** name/symbol/document are set per submission (`/assets/new` or
+  `issueAsset(...)` in `packages/hedera/src/flows.ts`); extend `AssetForReview` if the attester needs
+  more fields.
+- **Change the trading venue:** addresses in `packages/hedera/src/constants.ts` (`SAUCERSWAP_V1`);
+  pair/liquidity/swap logic in `packages/hedera/src/market.ts`; error strings in `errors.ts`.
 
 ## Frontend contract interaction
 
-Hooks live in `packages/nextjs/hooks/scaffold-hbar`. Use the names that exist in the codebase:
+Hooks in `packages/nextjs/hooks/scaffold-hbar` — use the names that exist:
+`useScaffoldReadContract`, `useScaffoldWriteContract`, `useScaffoldWatchContractEvent`,
+`useScaffoldEventHistory`, `useDeployedContractInfo`, `useScaffoldContract`, `useTransactor`.
 
-- `useScaffoldReadContract` — not `useScaffoldContractRead`
-- `useScaffoldWriteContract` — not `useScaffoldContractWrite`
+Native HAPI operations (token create with a threshold key, HCS, schedules) **can't be signed by an
+EVM wallet** — they live in Node-runtime server routes under `packages/nextjs/app/api/`, which in demo
+mode sign with the seeded actors via `packages/nextjs/utils/demo.ts`. Reads use the mirror node, not
+consensus queries.
 
-Also: `useScaffoldWatchContractEvent`, `useScaffoldEventHistory`, `useDeployedContractInfo`, `useScaffoldContract`, `useTransactor`.
+Web3 UI components come from `@scaffold-hbar-ui/components` (`Address`, `Balance`, …). Prefer DaisyUI
+classes over raw Tailwind when a component exists.
 
-```typescript
-const { data: balance } = useScaffoldReadContract({
-  contractName: "HederaToken",
-  functionName: "balanceOf",
-  args: [connectedAddress],
-});
-
-const { writeContractAsync, isPending } = useScaffoldWriteContract({
-  contractName: "HederaToken",
-});
-
-await writeContractAsync({
-  functionName: "mint",
-  args: [connectedAddress, parseEther("1")],
-});
-```
-
-`HederaToken.mint` is `onlyOwner`. For HTS creation, `HtsTokenCreator.createToken` is payable (HTS fee via `msg.value`) and emits `TokenCreated`.
-
-### UI
-
-Use `@scaffold-hbar-ui/components` for web3 UI: `Address`, `AddressInput`, `Balance`, `EtherInput`, `IntegerInput`.
-
-Use DaisyUI classes, not raw Tailwind when a DaisyUI component exists:
-
-```tsx
-<button className="btn btn-primary">Connect</button>
-```
-
-### Networks
+## Networks
 
 - Hardhat: `packages/hardhat/hardhat.config.ts` (`hederaTestnet` 296, `hederaMainnet` 295)
-- Foundry: `packages/foundry/foundry.toml` (`hedera_testnet`, `hedera_mainnet`)
-- Next.js: `packages/nextjs/scaffold.config.ts` (target networks, polling, RPC overrides, WalletConnect)
+- Next.js: `packages/nextjs/scaffold.config.ts` (target networks, RPC overrides, WalletConnect)
 
 ## Style
 
@@ -125,14 +103,8 @@ Use DaisyUI classes, not raw Tailwind when a DaisyUI component exists:
 | `UpperCamelCase` | types, components |
 | `lowerCamelCase` | variables, functions |
 | `CONSTANT_CASE` | constants |
-| `snake_case` | Hardhat deploy files and Foundry scripts |
+| `snake_case` | Hardhat deploy files |
 
-Next.js imports use the `~~` alias:
-
-```tsx
-import { useTargetNetwork } from "~~/hooks/scaffold-hbar";
-```
-
-App Router pages live under `packages/nextjs/app/`. Add `"use client"` when the page uses hooks.
-
-Prefer `type` over `interface`. No `T` prefix on types. Let TypeScript infer when it can. Comments should add information.
+Next.js imports use the `~~` alias. App Router pages live under `packages/nextjs/app/`; add
+`"use client"` when a page uses hooks. Prefer `type` over `interface`, no `T` prefix, let TypeScript
+infer. Comments should add information. Commit with Conventional Commits.
