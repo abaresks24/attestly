@@ -3423,6 +3423,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@sh/hedera@workspace:packages/hedera"
   dependencies:
+    "@hiero-ledger/proto": 2.26.0-beta.3
     "@hiero-ledger/sdk": ^2.80.0
     "@types/node": ^20.19.43
     dotenv: ^16.4.5

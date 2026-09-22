@@ -5,4 +5,6 @@ export * from "./client.js";
 export * from "./evm.js";
 export * from "./mirror.js";
 export * from "./accounts.js";
+export * from "./keys.js";
+export * from "./issuance.js";
 export * from "./errors.js";

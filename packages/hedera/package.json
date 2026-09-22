@@ -10,6 +10,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@hiero-ledger/proto": "2.26.0-beta.3",
     "@hiero-ledger/sdk": "^2.80.0",
     "dotenv": "^16.4.5"
   },
