@@ -7,10 +7,12 @@
   "license": "MIT",
   "scripts": {
     "accounts": "tsx setup-accounts.ts",
+    "topup": "tsx topup.ts",
     "s2": "tsx s2-threshold-mint.ts",
     "s4": "tsx s4-contract-keys.ts",
     "s3": "tsx s3-hip755-sign.ts",
-    "s1": "tsx s1-saucerswap-kyc.ts"
+    "s1": "tsx s1-saucerswap-kyc.ts",
+    "s1b": "tsx s1b-saucerswap-v1.ts"
   },
   "dependencies": {
     "@hashgraph/sdk": "^2.81.0",

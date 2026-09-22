@@ -55,3 +55,10 @@ export async function accountHbarBalance(accountId: string): Promise<number> {
   const data = await mirrorGet(`/accounts/${accountId}`);
   return (data?.balance?.balance ?? 0) / 1e8;
 }
+
+/** Resolves a CREATE2-deployed contract's EVM address to its Hedera 0.0.N id (via the mirror node). */
+export async function contractIdFromEvm(evmAddress: string): Promise<string> {
+  const data = await mirrorGet(`/contracts/${evmAddress}`);
+  if (!data?.contract_id) throw new Error(`no contract_id for ${evmAddress}`);
+  return data.contract_id;
+}

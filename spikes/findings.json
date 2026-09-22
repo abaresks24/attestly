@@ -290,6 +290,26 @@
       "ethers_tx": "0xef596beb53cfa6b81a7c14b87770c9569eed3abed57a4434602cb71959cfc229",
       "note": "attester1 signed via SDK, attester2 via ethers only; quorum reached -> auto mint. Confirms the wallet-mode attester path."
     },
-    "s1_saucerswap": { "status": "TBD_RUN", "pool_created": "TBD_RUN", "minimal_kyc_contract_set": "TBD_RUN", "investor_swap_verified": "TBD_RUN", "outsider_refused_code": "TBD_RUN", "v1_fallback_needed": "TBD_RUN" }
+    "s1_saucerswap": {
+      "status": "PARTIAL (V1 PASS; V2 blocked by testnet fee misconfig, not KYC)",
+      "v2_blocker": {
+        "cause": "SaucerSwap V2 testnet Factory.poolCreateFee = 1e16 tinycent = $1,000,000 (tinycent = 1e-10 USD per IExchangeRate). PoolInitializer.createAndInitializePoolIfNecessary reverts 'PCF' unless address(this).balance >= tinycentsToTinybars(poolCreateFee) ~ 1.28e15 tinybar ~ 12.8M HBAR. Factory.createPool has the same wall (require(msg.value >= convTinybar), msg.value is in TINYBARS on Hedera EVM).",
+        "verdict": "Unfixable by us (only the factory feeToSetter can setPoolCreateFee). A testnet misconfiguration vs mainnet (~$1). NOT a KYC limitation.",
+        "source": "saucerswaplabs/saucerswaplabs-v2-core UniswapV3Factory.sol + saucerswaplabs-v2-periphery base/PoolInitializer.sol",
+        "hedera_unit_note": "On Hedera EVM msg.value AND address(this).balance are in TINYBARS (1e8/HBAR), not weibars. ethers value (weibar) is divided by 1e10 by the relay before the call."
+      },
+      "v1_pass": {
+        "venue": "SaucerSwap V1 (UniswapV2 fork), factory 0.0.9959, router 0.0.19264",
+        "pairCreateFee": "2e10 tinycent = $2.00 = ~25.6 HBAR (affordable)",
+        "token": "0.0.10670521",
+        "pair": "0.0.10670524 (CREATE2-deployed, NOT long-zero; resolve id via mirror /contracts/{evm})",
+        "investor_swap_verified": "investor received 45330 share units from pool->investor (mirror verified)",
+        "outsider_refused_code": "HTS ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN (176) at the deepest 0x167 action; SaucerSwap TransferHelper masks it as revert 'Safe token transfer failed!' at the pair/router",
+        "minimal_kyc_contract_set": "ONLY the pair needs KYC (GRANTED). The router does NOT (UniV2 moves the token directly issuer->pair->recipient; the router never holds it -> its grant returned TOKEN_NOT_ASSOCIATED and is unnecessary).",
+        "ordering": "create empty pair (factory.createPair, permissionless) FIRST -> resolve pair id -> grant KYC to pair -> add liquidity (addLiquidityETH). Avoids the atomic createPair+liquidity vs KYC-grant conflict.",
+        "gas": "createPair needs ~9M gas (HTS self-association inside pair init); addLiquidityETH ~8M; swap ~6M. HTS ops inside contracts are gas-heavy."
+      },
+      "template_impact": "Template ships SaucerSwap V1 as the KYC-gated venue on testnet, with V2 wiring + the documented testnet fee limitation. FR-7 error map must translate SaucerSwap 'Safe token transfer failed!' -> likely KYC-not-granted or paused (raw HTS code only visible in mirror action trace)."
+    }
   }
 }
