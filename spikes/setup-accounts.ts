@@ -1,8 +1,8 @@
 // Creates (once) and reports the shared testnet actors used by every spike.
 // Keys are ECDSA secp256k1 (required for S3/HIP-755), persisted to spikes/.keys.json (gitignored).
-import { AccountBalanceQuery } from "@hashgraph/sdk";
 import { loadOperator, testnetClient, link } from "./lib/hedera.js";
 import { ensureAccount, loadKeystore } from "./lib/accounts.js";
+import { accountHbarBalance } from "./lib/mirror.js";
 
 // Modest funding; issuer and investor pay for pool creation / liquidity / swaps in S1.
 const FUNDING: Record<string, number> = {
@@ -19,8 +19,7 @@ async function main() {
   const client = testnetClient(op);
   const store = loadKeystore();
 
-  const balance = await new AccountBalanceQuery().setAccountId(op.id).execute(client);
-  const hbar = balance.hbars.toBigNumber().toNumber();
+  const hbar = await accountHbarBalance(op.id.toString());
   console.log(`Operator ${op.id.toString()}  ${hbar} HBAR  ${link.account(op.id.toString())}`);
   if (hbar < 50) {
     throw new Error(`Operator balance ${hbar} HBAR is below the 50 HBAR floor. Top up from the faucet.`);

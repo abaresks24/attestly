@@ -52,7 +52,13 @@ export function loadOperator(): Operator {
 }
 
 export function testnetClient(op: Operator): Client {
-  return Client.forTestnet().setOperator(op.id, op.key);
+  // Testnet consensus nodes return BUSY under load; widen retries and backoff so
+  // transient congestion doesn't fail a spike run.
+  return Client.forTestnet()
+    .setOperator(op.id, op.key)
+    .setMaxAttempts(40)
+    .setMinBackoff(500)
+    .setMaxBackoff(8000);
 }
 
 export const link = {
@@ -67,6 +73,12 @@ export const link = {
 export function idToEvmAddress(id: AccountId | string): string {
   const account = typeof id === "string" ? AccountId.fromString(id) : id;
   return "0x" + account.toSolidityAddress();
+}
+
+/** Any entity 0.0.N (schedule, token, contract) -> long-zero EVM address from its entity number. */
+export function entityLongZero(id: string): string {
+  const num = BigInt(id.split(".").pop()!);
+  return "0x" + num.toString(16).padStart(40, "0");
 }
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));

@@ -49,3 +49,9 @@ export const contractActions = (txIdOrHash: string) =>
   mirrorGet(`/contracts/results/${txIdOrHash}/actions`);
 
 export const exchangeRate = () => mirrorGet(`/network/exchangerate`);
+
+/** Operator/account HBAR balance from the mirror node (REST, avoids busy consensus nodes). */
+export async function accountHbarBalance(accountId: string): Promise<number> {
+  const data = await mirrorGet(`/accounts/${accountId}`);
+  return (data?.balance?.balance ?? 0) / 1e8;
+}

@@ -248,12 +248,48 @@
   },
 
   "measured_on_chain": {
-    "_note": "Filled during spike runs. TBD_RUN until then.",
-    "operator_account": "TBD_RUN",
-    "test_accounts": "TBD_RUN (spikes/.keys.json)",
-    "s2_threshold_mint": { "long_expiry_accepted": "TBD_RUN", "mint_executes_at_kth_sig": "TBD_RUN", "larger_committee_sizes": "TBD_RUN" },
-    "s4_contract_keys": { "grant_kyc_gas": "TBD_RUN", "pause_gas": "TBD_RUN", "outsider_transfer_code": "TBD_RUN (expect 176)", "paused_transfer_code": "TBD_RUN (expect 265)" },
-    "s3_hip755": { "eoa_sign_works": "TBD_RUN", "call_form_used": "TBD_RUN" },
-    "s1_saucerswap": { "pool_created": "TBD_RUN", "minimal_kyc_contract_set": "TBD_RUN", "investor_swap_verified": "TBD_RUN", "outsider_refused_code": "TBD_RUN", "v1_fallback_needed": "TBD_RUN" }
+    "_note": "Filled during spike runs.",
+    "operator_account": "0.0.10667593 (ECDSA, 1000 HBAR at start)",
+    "test_accounts": {
+      "issuer": "0.0.10670047",
+      "attester1": "0.0.10670049",
+      "attester2": "0.0.10670050",
+      "attester3": "0.0.10670051",
+      "investor": "0.0.10670052",
+      "outsider": "0.0.10670053",
+      "note": "ECDSA, EVM alias, unlimited auto-association; keys in spikes/.keys.json (gitignored)"
+    },
+    "s2_threshold_mint": {
+      "status": "PASS",
+      "long_expiry_accepted": "yes - 24h ScheduleCreate expiry accepted (HIP-423), waitForExpiry=false",
+      "mint_executes_at_kth_sig": "yes - not executed at 1 sig (supply 0), auto-executed at 2nd sig (supply 1,000,000 to issuer treasury)",
+      "key_verification": "mirror supply_key decoded as ThresholdKey(2 of 3 attesters); admin_key null - confirmed via protobuf decode",
+      "token": "0.0.10670055",
+      "schedule": "0.0.10670056",
+      "executed_timestamp": "1790106675.629653765",
+      "larger_committee_sizes": "TBD_RUN (optional S2b)"
+    },
+    "s4_contract_keys": {
+      "status": "PASS",
+      "contract": "0.0.10670108 (KycPauseProbe, non-proxy)",
+      "token": "0.0.10670110",
+      "grant_kyc_gas": 40692,
+      "pause_gas": 40147,
+      "unpause_gas": 40125,
+      "deploy_gas_needed": "1,000,000 (300k -> INSUFFICIENT_GAS)",
+      "outsider_transfer_code": "ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN (176) confirmed",
+      "paused_transfer_code": "TOKEN_IS_PAUSED (265) confirmed",
+      "GOTCHA_alias_address": "HTS grantTokenKyc(token, account) needs the account's ALIAS EVM address (keccak of ECDSA pubkey, = mirror evm_address), NOT the long-zero derived from the account id. Passing long-zero returned INVALID_ACCOUNT_ID (15). Tokens use long-zero (no alias). In the template, an investor-initiated enableAsset() uses msg.sender (the alias) naturally; only admin-provided-address grants must resolve the alias."
+    },
+    "s3_hip755": {
+      "status": "PASS",
+      "eoa_sign_works": "yes - schedule executed from an ethers-only signature via Hashio",
+      "call_form_used": "Form B: IHRC755ScheduleFacade.signSchedule() called on the schedule's long-zero address (selector 0x06d15889); gasLimit 800k; wallet built from attester ECDSA raw key via ethers.Wallet",
+      "token": "0.0.10670121",
+      "schedule": "0.0.10670123",
+      "ethers_tx": "0xef596beb53cfa6b81a7c14b87770c9569eed3abed57a4434602cb71959cfc229",
+      "note": "attester1 signed via SDK, attester2 via ethers only; quorum reached -> auto mint. Confirms the wallet-mode attester path."
+    },
+    "s1_saucerswap": { "status": "TBD_RUN", "pool_created": "TBD_RUN", "minimal_kyc_contract_set": "TBD_RUN", "investor_swap_verified": "TBD_RUN", "outsider_refused_code": "TBD_RUN", "v1_fallback_needed": "TBD_RUN" }
   }
 }
