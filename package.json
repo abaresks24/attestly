@@ -1,14 +1,18 @@
 {
-  "name": "sh",
-  "version": "0.0.1",
+  "name": "attested-rwa",
+  "version": "0.1.0",
   "private": true,
   "workspaces": {
     "packages": [
       "packages/hardhat",
-      "packages/nextjs"
+      "packages/nextjs",
+      "packages/hedera"
     ]
   },
   "scripts": {
+    "seed:demo": "yarn workspace @sh/hedera seed",
+    "deploy:testnet": "yarn workspace @sh/hardhat deploy --network hederaTestnet",
+    "hedera:check-types": "yarn workspace @sh/hedera check-types",
     "format": "yarn next:format && yarn hardhat:format",
     "hardhat:account": "yarn workspace @sh/hardhat account",
     "hardhat:account:generate": "yarn workspace @sh/hardhat account:generate",
