@@ -27,6 +27,7 @@ export function demoKeys(): DemoKeys {
 }
 
 export const registryEvm = (): string => deployedContracts[296].AssetRegistry.address;
+export const investorRegistryEvm = (): string => deployedContracts[296].InvestorRegistry.address;
 
 let cachedRegistryId: string | null = null;
 export async function registryId(): Promise<string> {
@@ -41,6 +42,7 @@ export interface AssetState {
   topicId: string;
   schedule: string;
   token: string;
+  pair?: string; // V1 pair id (0.0.N), set at finalize
 }
 type StateFile = Record<string, AssetState>;
 
@@ -50,5 +52,12 @@ export function loadState(): StateFile {
 export function saveAssetState(assetId: number, state: AssetState) {
   const all = loadState();
   all[assetId] = state;
+  writeFileSync(STATE, JSON.stringify(all, null, 2));
+}
+/** Merges the resolved pair id into an existing asset's state (set once the pair is created). */
+export function setAssetPair(assetId: number, pair: string) {
+  const all = loadState();
+  if (!all[assetId]) throw new Error("no issuance state for this asset");
+  all[assetId] = { ...all[assetId], pair };
   writeFileSync(STATE, JSON.stringify(all, null, 2));
 }

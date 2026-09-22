@@ -5,7 +5,7 @@
 const HTS_MESSAGES: Record<string, string> = {
   ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN: "This account is not KYC-verified for the asset, so it cannot hold or receive shares.",
   TOKEN_IS_PAUSED: "Trading is paused for this asset (the guardian triggered an emergency stop).",
-  INVALID_SIGNATURE: "A required signature is missing — the attester quorum has not been reached yet.",
+  INVALID_SIGNATURE: "A required signature is missing — the signing threshold has not been reached yet.",
   TOKEN_NOT_ASSOCIATED_TO_ACCOUNT: "This account has not associated the asset token yet.",
   ACCOUNT_FROZEN_FOR_TOKEN: "This account is frozen for the asset token.",
   SCHEDULE_ALREADY_EXECUTED: "The scheduled mint has already executed.",

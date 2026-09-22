@@ -43,15 +43,16 @@ Testnet evidence is detailed in [TESTNET_VERIFICATION.md](./TESTNET_VERIFICATION
 
 ## Increment 03 — KYC-gated market and guardian
 
-On-chain core proven end-to-end (`demo-market.ts`, `demo-guardian.ts`); market UI page pending.
+Core proven end-to-end (`demo-market.ts`, `demo-guardian.ts`) **and** through the market UI + server
+routes, each verified over HTTP against the running app (see TESTNET_VERIFICATION.md → UI-route run).
 
 - [x] **1. Increments 01–02 acceptance still passes.** Contracts unchanged (redeployed with a 120s demo lockup); 8 unit tests + issuance flow still green.
-- [x] **2. Pool created on testnet; address and HashScan link shown.** V1 pair `0.0.10672243` created via `finalizeAsset`+`createPair` (fee ~$2).
-- [x] **3. A verified investor swaps HBAR for shares; mirror shows pool → investor transfer.** Investor swapped 1 HBAR → 45,330 shares (mirror balance delta).
-- [x] **4. An unverified account cannot receive shares; UI shows the Hedera status and a plain explanation.** HTS refuses with `ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN` (176) (proven in spike S1b); `explainError` maps it + SaucerSwap's "Safe token transfer failed!" wrapper. _UI surfacing lands with the market page._
-- [x] **5. A guardian pause signed by 1 member fails; signed by 2 succeeds; swaps then fail; unpause restores trading.** `demo-guardian.ts`: 1 sig → `INVALID_SIGNATURE`, 2 sigs → `PAUSED`; a swap while paused is refused; unpause → `UNPAUSED`, trading resumes.
+- [x] **2. Pool created on testnet; address and HashScan link shown.** V1 pair `0.0.10672243` (demo script) and `0.0.10672186` (UI); the market page shows the pair id + HashScan link. `POST /api/assets/[id]/market/finalize` creates the pair (or reuses the factory's) and grants it KYC.
+- [x] **3. A verified investor swaps HBAR for shares; mirror shows pool → investor transfer.** `POST …/market/swap` as investor `0.0.10671267` → tx `0x6addabe8…`, mirror balance `45,330` shares.
+- [x] **4. An unverified account cannot receive shares; UI shows the Hedera status and a plain explanation.** `POST …/market/swap` as the unverified investor is refused; the route diagnoses the cause from the mirror (`TOKEN_NOT_ASSOCIATED_TO_ACCOUNT` / `ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN` / `TOKEN_IS_PAUSED`) and `explainError` renders a plain sentence (also covers SaucerSwap's "Safe token transfer failed!" wrapper). The page shows per-investor `kyc_status`.
+- [x] **5. A guardian pause signed by 1 member fails; signed by 2 succeeds; swaps then fail; unpause restores trading.** Both `demo-guardian.ts` and `POST …/market/guardian`: 1 sig → `INVALID_SIGNATURE`, 2 sigs → `PAUSED`; a swap while paused is refused (`TOKEN_IS_PAUSED`); unpause → `UNPAUSED`, trading resumes.
 
-_Remaining 03: `/assets/[id]/market` page + market server routes (finalize/createPair/addLiquidity/enable/swap/guardian), mirroring the increment-02 UI._
+**Market UI + routes (verified via HTTP on testnet):** `/assets/[id]/market` drives the five steps — finalize/create-pair, add-liquidity, verify-investor (approve + associate + KYC), swap, guardian pause/unpause — over `/api/assets/[id]/market/*`. All routes return 200 with the operator set; the page renders and boots with no env.
 
 ## Increment 04 — Documentation and polish
 

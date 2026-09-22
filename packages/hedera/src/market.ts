@@ -48,6 +48,12 @@ export async function createPair(issuerDerKey: string, tokenId: string): Promise
   return { pairEvm, pairId: await contractIdFromEvm(pairEvm) };
 }
 
+/** Resolves the V1 pair for a token (zero address if none created yet). Read-only, no key needed. */
+export async function getPairEvm(tokenId: string): Promise<string> {
+  const factory = new ethers.Contract(entityLongZero(SAUCERSWAP_V1.factory), FACTORY_ABI, provider());
+  return factory.getPair(idToEvmAddress(tokenId), entityLongZero(SAUCERSWAP_V1.whbarToken));
+}
+
 /** finalize(assetId, pair): the registry grants KYC to the pair (only contract that must hold the token). */
 export async function finalizeAsset(issuerDerKey: string, registryEvm: string, assetId: number, pairEvm: string): Promise<void> {
   await (await registryAs(registryEvm, issuerDerKey).finalize(assetId, pairEvm, { gasLimit: 1_000_000 })).wait();

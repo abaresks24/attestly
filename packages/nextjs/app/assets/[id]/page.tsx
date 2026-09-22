@@ -94,6 +94,15 @@ const AssetDetail: NextPage = () => {
           </div>
         )}
 
+        {(asset.status === "Minted" || asset.status === "Finalized") && (
+          <div className="alert mb-6">
+            <span>Open the KYC-gated market: create the pair, verify investors, trade, and run the guardian stop.</span>
+            <Link href={`/assets/${asset.assetId}/market`} className="btn btn-sm btn-primary">
+              Market →
+            </Link>
+          </div>
+        )}
+
         <h2 className="text-lg font-semibold mb-2">Audit trail (HCS)</h2>
         {timeline.length === 0 ? (
           <div className="opacity-60 text-sm">No topic messages.</div>

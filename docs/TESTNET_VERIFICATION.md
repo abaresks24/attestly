@@ -52,3 +52,16 @@ End-to-end run: `yarn workspace @sh/hedera exec tsx src/demo-market.ts` (asset #
 | Guardian pause (2 sig) | — | token `PAUSED`; a swap while paused is refused |
 | Guardian unpause (2 sig) | — | token `UNPAUSED`; trading resumes |
 | Unverified refused | — | `ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN` (176) — spike S1b |
+
+**UI-route run** (market server routes behind `/assets/[id]/market`, asset #1, token `0.0.10672156`, pair `0.0.10672186`), each verified over HTTP against the running app:
+
+| Route | Call | Result |
+|---|---|---|
+| `GET /api/assets/1/market` | — | resolves pair from the V1 factory, reads `pause_status`, per-investor `kyc_status` + balance |
+| `POST …/market/guardian` `{pause:true,[0]}` | pause, 1 signer | refused → `INVALID_SIGNATURE` mapped to a plain sentence |
+| `POST …/market/guardian` `{pause:true,[0,1]}` | pause, 2 signers | ok → token `PAUSED` (mirror) |
+| `POST …/market/swap` `{investorIndex:0}` while paused | verified investor | refused → diagnosed as `TOKEN_IS_PAUSED` from the mirror |
+| `POST …/market/guardian` `{pause:false,[1,2]}` | unpause, 2 signers | ok → token `UNPAUSED` |
+| `POST …/market/enable` `{investorIndex:0}` | admin approve + associate + KYC | investor `0.0.10671267` → `kyc_status: GRANTED` |
+| `POST …/market/swap` `{investorIndex:0}` | verified investor | ok → tx `0x6addabe8006301a56aaf16cb4078cd904758f515f7fe660fe6cbe47294c87be2`, balance `45,330` shares |
+| `POST …/market/swap` `{investorIndex:1}` | unverified investor | refused → `TOKEN_NOT_ASSOCIATED_TO_ACCOUNT`, plain explanation |
