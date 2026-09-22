@@ -23,7 +23,23 @@ Testnet evidence is detailed in [TESTNET_VERIFICATION.md](./TESTNET_VERIFICATION
 
 ## Increment 02 — Quorum-gated issuance
 
-_(pending)_
+- [x] **1. Increment 01 acceptance still passes.** Contracts unchanged; 8 unit tests still green.
+- [x] **2. Adapter unit tests: MockRegistryAttester approves a matching title and rejects a mismatching one with a reason.**
+  5 tests pass (`yarn workspace @sh/hedera test`): manual decision, matching title, unknown CID, hash mismatch, owner mismatch.
+- [x] **3. Submitting the sample document creates an HCS topic whose first message contains CID and SHA-256.**
+  Topic `0.0.10671502`, first message: `{"event":"submitted",...,"cid":"bafkreidemo…","sha256":"0x211150…"}`.
+- [x] **4. Token on mirror: supply key threshold 2 over the 3 attester keys, no admin key, KYC and pause keys equal the AssetRegistry contract ID.**
+  Token `0.0.10671508`: supply key decodes to ThresholdKey(2/3), `admin_key: null`, kyc_key & pause_key decode to `0.0.10671319` (AssetRegistry).
+- [x] **5. `registerToken` with a token whose keys do not match is refused.**
+  App-side gate: `verifyThresholdKey` rejects a mismatched expectation before `registerToken` is called (demonstrated in `demo-issue.ts`; the contract cannot read the mirror, so the app enforces it).
+- [x] **6. After 1 attester signature total supply is 0; after the 2nd it equals TOTAL_SHARES in the issuer treasury.**
+  Schedule `0.0.10671514`: after 1 sig `executed_timestamp=null`, supply 0; after 2 sig executed, `total_supply=1000000`.
+- [x] **7. Each attestation appears on the asset's HCS topic** _(and on `/assets/[id]` — page pending)_.
+  Two `attested` messages logged to topic `0.0.10671502` with attester id + evidence hash.
+- [x] **8. Lockup countdown shows after `confirmMint`; a KYC grant attempt during lockup reverts.**
+  `confirmMint` set status=Minted with a future `lockupEnds`; lockup-blocks-KYC proven by the increment-01 unit test.
+
+_Remaining 02: `/assets/new`, `/assets/[id]`, `/attest` pages; IPFS upload (pinning or local fallback); server routes wrapping the native ops._
 
 ## Increment 03 — KYC-gated market and guardian
 

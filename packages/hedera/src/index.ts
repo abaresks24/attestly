@@ -7,4 +7,5 @@ export * from "./mirror.js";
 export * from "./accounts.js";
 export * from "./keys.js";
 export * from "./issuance.js";
+export * from "./attesters/index.js";
 export * from "./errors.js";

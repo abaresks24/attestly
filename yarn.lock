@@ -3427,6 +3427,7 @@ __metadata:
     "@hiero-ledger/sdk": ^2.80.0
     "@types/node": ^20.19.43
     dotenv: ^16.4.5
+    ethers: ^6.14.0
     tsx: ^4.19.2
     typescript: ^5.8.2
   languageName: unknown

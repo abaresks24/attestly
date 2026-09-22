@@ -1,0 +1,11 @@
+{
+  "_comment": "Demo land registry used by MockRegistryAttester. Replace with a real registry API to build a production attester.",
+  "titles": [
+    {
+      "cid": "bafkreidemoattestedrwaparcel12",
+      "documentHash": "0x211150b1c6f1522b93a1ec46985b9dfa1cc99a5b471e3f79624e5d280d4220af",
+      "owner": "Issuer Demo",
+      "parcel": "Parcel 12"
+    }
+  ]
+}

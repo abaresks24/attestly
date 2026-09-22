@@ -18,7 +18,19 @@ Operator `0.0.10667593` (ECDSA). Deeper feasibility evidence is in `spikes/REPOR
 
 ## Increment 02 — Issuance
 
-_(pending: HCS topic, token creation, schedule signatures, mint, finalize)_
+End-to-end run: `yarn workspace @sh/hedera exec tsx src/demo-issue.ts` (asset #0).
+
+| Step | Entity / tx | Proof |
+|---|---|---|
+| HCS topic (audit trail) | topic `0.0.10671502` | first message contains `cid` + `sha256` |
+| submitAsset (issuer) | asset #0 | `AssetSubmitted` event |
+| Create asset token | token `0.0.10671508` | [HashScan](https://hashscan.io/testnet/token/0.0.10671508) |
+| Key set verified on mirror | — | supply = ThresholdKey(2/3), `admin_key: null`, kyc_key & pause_key = `0.0.10671319` |
+| registerToken (issuer, keys matched) | — | app refuses if `verifyThresholdKey` fails |
+| Attestations (2 of 3) | attesters `0.0.10671258`, `0.0.10671259` | on-chain + HCS `attested` messages |
+| Scheduled mint | schedule `0.0.10671514` | [HashScan](https://hashscan.io/testnet/schedule/0.0.10671514) |
+| Mint at quorum | — | 1 sig → supply 0; 2 sig → executed, `total_supply=1000000` |
+| confirmMint (lockup) | — | status=Minted, `lockupEnds` in the future |
 
 ## Increment 03 — Market
 
