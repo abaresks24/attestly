@@ -36,3 +36,7 @@ artifacts/
 cache/
 typechain-types/
 .next/
+
+# demo uploads + state
+mock-registry/uploads/
+.demo-state.json
