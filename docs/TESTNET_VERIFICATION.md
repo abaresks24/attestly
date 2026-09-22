@@ -34,6 +34,21 @@ End-to-end run: `yarn workspace @sh/hedera exec tsx src/demo-issue.ts` (asset #0
 
 **UI-route run** (`POST /api/assets` → `POST /api/assets/1/attest` ×2): asset #1, token `0.0.10671876`, schedule `0.0.10671880`, topic `0.0.10671874`. Two attester approvals via the route → schedule executed, `total_supply=1000000` to issuer treasury, kyc/pause key = registry, `admin_key: null`. Proves the issuance + attestation server routes end-to-end.
 
-## Increment 03 — Market
+## Increment 03 — Market (SaucerSwap V1)
 
-_(pending: pool creation, swap, pause, unpause)_
+Fresh registry with a 120s demo lockup: AssetRegistry `0xB461DD05E0E5C803ac11110E51A9DdCAd0c0Ab62`,
+InvestorRegistry `0xbcB2237B6FB03390bDEC0b0A58998472563fE48b`.
+
+End-to-end run: `yarn workspace @sh/hedera exec tsx src/demo-market.ts` (asset #2).
+
+| Step | Entity | Proof |
+|---|---|---|
+| Asset token | `0.0.10672214` | issued + minted (quorum) + confirmMint → lockup |
+| Create V1 pair | `0.0.10672243` | SaucerSwap V1 factory `0.0.9959` (pairCreateFee ~$2) |
+| finalize → KYC to pair | — | registry (KYC key) grants the pair KYC |
+| Add liquidity | — | 500,000 shares / 10 HBAR via router `0.0.19264` |
+| Verified investor swap | investor `0.0.10671267` | 1 HBAR → **45,330 shares** (mirror balance delta) |
+| Guardian pause (1 sig) | guardian `0.0.10671266` | refused `INVALID_SIGNATURE` (`demo-guardian.ts`) |
+| Guardian pause (2 sig) | — | token `PAUSED`; a swap while paused is refused |
+| Guardian unpause (2 sig) | — | token `UNPAUSED`; trading resumes |
+| Unverified refused | — | `ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN` (176) — spike S1b |

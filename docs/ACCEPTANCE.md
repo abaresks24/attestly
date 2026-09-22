@@ -43,7 +43,15 @@ Testnet evidence is detailed in [TESTNET_VERIFICATION.md](./TESTNET_VERIFICATION
 
 ## Increment 03 — KYC-gated market and guardian
 
-_(pending)_
+On-chain core proven end-to-end (`demo-market.ts`, `demo-guardian.ts`); market UI page pending.
+
+- [x] **1. Increments 01–02 acceptance still passes.** Contracts unchanged (redeployed with a 120s demo lockup); 8 unit tests + issuance flow still green.
+- [x] **2. Pool created on testnet; address and HashScan link shown.** V1 pair `0.0.10672243` created via `finalizeAsset`+`createPair` (fee ~$2).
+- [x] **3. A verified investor swaps HBAR for shares; mirror shows pool → investor transfer.** Investor swapped 1 HBAR → 45,330 shares (mirror balance delta).
+- [x] **4. An unverified account cannot receive shares; UI shows the Hedera status and a plain explanation.** HTS refuses with `ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN` (176) (proven in spike S1b); `explainError` maps it + SaucerSwap's "Safe token transfer failed!" wrapper. _UI surfacing lands with the market page._
+- [x] **5. A guardian pause signed by 1 member fails; signed by 2 succeeds; swaps then fail; unpause restores trading.** `demo-guardian.ts`: 1 sig → `INVALID_SIGNATURE`, 2 sigs → `PAUSED`; a swap while paused is refused; unpause → `UNPAUSED`, trading resumes.
+
+_Remaining 03: `/assets/[id]/market` page + market server routes (finalize/createPair/addLiquidity/enable/swap/guardian), mirroring the increment-02 UI._
 
 ## Increment 04 — Documentation and polish
 
