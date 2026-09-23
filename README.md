@@ -184,3 +184,8 @@ and sketched in [docs/PROTOCOL_VISION.md](docs/PROTOCOL_VISION.md).
 
 Coding-agent briefing (repo map, commands, invariants, how to add an attester/parameter/asset type):
 [AGENTS.md](AGENTS.md).
+
+## License
+
+MIT — see [LICENSE](LICENSE). Built on the [scaffold-hbar](https://github.com/hedera-dev/create-scaffold-hbar)
+base (© hedera-dev), itself derived from Scaffold-ETH 2 (© BuidlGuidl), both MIT.
