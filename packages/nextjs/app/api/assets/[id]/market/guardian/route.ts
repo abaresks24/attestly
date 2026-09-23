@@ -13,6 +13,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (!demoConfigured()) return NextResponse.json({ error: "Demo not seeded." }, { status: 400 });
   const { id } = await params;
   const assetId = Number(id);
+  if (!Number.isInteger(assetId) || assetId < 0)
+    return NextResponse.json({ error: "invalid asset id" }, { status: 400 });
   const body = await req.json().catch(() => ({}));
   const pause = body.pause !== false;
   const memberIndexes: number[] = Array.isArray(body.memberIndexes) ? body.memberIndexes : [0, 1];
@@ -35,7 +37,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     });
     return NextResponse.json({ ok: true, pause, signers: memberKeys.length });
   } catch (e: any) {
-    const readable = explainError(e?.status?.toString() ?? e?.message ?? "reverted");
+    // ReceiptStatusError carries a Status: prefer its numeric _code (mapped by HTS_CODES), then the
+    // status name, then the raw message — so a below-threshold pause always reads as INVALID_SIGNATURE.
+    const readable = explainError(e?.status?._code ?? e?.status?.toString() ?? e?.message ?? "reverted");
     console.error("[api/market/guardian]", readable.code);
     return NextResponse.json(
       { error: readable.message, code: readable.code, signers: memberKeys.length },

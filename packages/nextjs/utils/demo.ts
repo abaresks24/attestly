@@ -54,10 +54,14 @@ export function saveAssetState(assetId: number, state: AssetState) {
   all[assetId] = state;
   writeFileSync(STATE, JSON.stringify(all, null, 2));
 }
-/** Merges the resolved pair id into an existing asset's state (set once the pair is created). */
+/**
+ * Records the resolved pair id for an asset. Upserts: the pair is created and KYC-granted on-chain
+ * before this runs, so a missing/lost local state entry must not turn a successful finalize into a
+ * permanent 500. The GET route can always re-resolve the pair from the factory anyway.
+ */
 export function setAssetPair(assetId: number, pair: string) {
   const all = loadState();
-  if (!all[assetId]) throw new Error("no issuance state for this asset");
-  all[assetId] = { ...all[assetId], pair };
+  const existing = all[assetId] ?? { topicId: "", schedule: "", token: "" };
+  all[assetId] = { ...existing, pair };
   writeFileSync(STATE, JSON.stringify(all, null, 2));
 }

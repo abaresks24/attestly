@@ -13,6 +13,8 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   if (!demoConfigured()) return NextResponse.json({ error: "Demo not seeded." }, { status: 400 });
   const { id } = await params;
   const assetId = Number(id);
+  if (!Number.isInteger(assetId) || assetId < 0)
+    return NextResponse.json({ error: "invalid asset id" }, { status: 400 });
   const asset = await getAssetView(registryEvm(), assetId).catch(() => null);
   if (!asset || asset.token === ZERO) {
     return NextResponse.json({ error: "asset has no token yet" }, { status: 400 });
