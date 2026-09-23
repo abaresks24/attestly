@@ -1,12 +1,12 @@
-# Attested RWA
+# Attestly
 
-A scaffold-hbar template for issuing a real-world-asset token that **the network itself refuses to
-mint** until a quorum of independent attesters approves — then trading it on a **KYC-gated SaucerSwap
-pool** where only verified accounts can hold the token. Every step is written to a per-asset HCS
-audit trail and linked to HashScan.
+**Attested real-world assets on Hedera.** A scaffold-hbar template for issuing a real-world-asset
+token that **the network itself refuses to mint** until a quorum of independent attesters approves —
+then trading it on a **KYC-gated SaucerSwap pool** where only verified accounts can hold the token.
+Every step is written to a per-asset HCS audit trail and linked to HashScan.
 
 ```bash
-npm create scaffold-hbar@latest -- --template <your-org>/attested-rwa
+npm create scaffold-hbar@latest -- --template abaresks24/attestly
 ```
 
 > Built for the Scaffold-HBAR Template Bounty. MIT licensed. **Testnet demo — the token carries no
@@ -33,7 +33,7 @@ It gives you three patterns every RWA project needs, working together and each u
 ## 60-second quickstart
 
 ```bash
-git clone <this-repo> && cd attested-rwa
+git clone https://github.com/abaresks24/attestly && cd attestly
 yarn install
 
 # 1. Fund a testnet operator at https://portal.hedera.com (ECDSA), then:

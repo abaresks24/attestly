@@ -1,6 +1,6 @@
 # Architecture
 
-How the Attested RWA template is put together, and why each piece lives where it does. For the
+How the Attestly template is put together, and why each piece lives where it does. For the
 product overview and quickstart, read the [README](../README.md); to change behavior, read
 [ADAPTING.md](./ADAPTING.md).
 

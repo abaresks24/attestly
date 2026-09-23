@@ -1,6 +1,7 @@
 # Agent instructions
 
-Briefing for coding agents (Cursor, Claude Code, Codex) working in the **Attested RWA** template.
+Briefing for coding agents (Cursor, Claude Code, Codex) working in the **Attestly** template (attested
+real-world assets on Hedera).
 Claude Code loads this through `CLAUDE.md`. For the product overview read [README.md](README.md); for
 how the pieces fit, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); to change behavior,
 [docs/ADAPTING.md](docs/ADAPTING.md).

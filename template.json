@@ -1,6 +1,6 @@
 {
-  "name": "attested-rwa",
-  "description": "Issue a real-world asset token the network refuses to mint until a quorum of independent attesters signs, then trade it on a KYC-gated SaucerSwap pool.",
+  "name": "attestly",
+  "description": "Attestly — issue a real-world asset token the network refuses to mint until a quorum of independent attesters signs, then trade it on a KYC-gated SaucerSwap pool.",
   "version": "0.1.0",
   "create-scaffold-hbar": {
     "capabilities": {
@@ -16,7 +16,7 @@
         {
           "steps": [
             {
-              "text": "Attested RWA: the token's supply key is a native ThresholdKey of attester keys, its KYC and pause keys are the AssetRegistry contract, and it trades on a KYC-gated SaucerSwap pool. Runs on Hedera testnet."
+              "text": "Attestly: the token's supply key is a native ThresholdKey of attester keys, its KYC and pause keys are the AssetRegistry contract, and it trades on a KYC-gated SaucerSwap pool. Runs on Hedera testnet."
             }
           ]
         },
