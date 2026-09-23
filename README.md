@@ -158,7 +158,11 @@ This template makes its trust boundaries explicit so you can decide what to hard
   attesters signed; it cannot prove the document is true. That is what the attesters are for.
 - **Demo mode holds keys server-side.** `yarn seed:demo` writes actor keys to a gitignored
   `.demo-keys.json` so the app can act as issuer/attester/guardian for a one-machine walkthrough.
-  Production uses wallet mode (RainbowKit + HIP-755); no private keys on the server.
+  The `/api/assets/**` server routes are **intentionally unauthenticated demo endpoints** — any caller
+  who can reach the server picks which seeded actor to sign as. Run them only locally/on testnet;
+  **never expose the app publicly or point it at mainnet.** Production uses wallet mode (RainbowKit +
+  HIP-755) with no private keys on the server. The on-chain invariants (KYC gating, quorum mint,
+  guardian threshold) hold regardless of who calls the routes — the network enforces them.
 - **Venue is SaucerSwap V1 on testnet.** V2 pool creation is blocked on testnet by a misconfigured
   `poolCreateFee`; the venue is a config seam (`packages/hedera/src/constants.ts`). See
   [BUILD_PLAN.md](docs/BUILD_PLAN.md) G1.

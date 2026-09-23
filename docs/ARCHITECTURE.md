@@ -56,6 +56,12 @@ routes that, in demo mode, sign with the seeded actors' keys (`packages/nextjs/u
 The reads never touch consensus nodes — they use the mirror node REST API (with propagation-aware
 retry) to avoid `BUSY`/timeout responses under load.
 
+> **Security note.** These POST routes are **unauthenticated by design** — in demo mode the server
+> holds every seeded actor's key and the request body selects which actor to sign as. That is fine for
+> a local/testnet walkthrough and cannot break the on-chain invariants (KYC, quorum, guardian
+> threshold are enforced by the network), but the app must **never** be exposed publicly or pointed at
+> mainnet. Production replaces demo mode with wallet mode (no server-side keys).
+
 ## Shared helpers (`packages/hedera/src`)
 
 The typed layer both the routes and the `demo-*.ts` scripts import:

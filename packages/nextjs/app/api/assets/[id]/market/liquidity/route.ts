@@ -7,6 +7,8 @@ export const maxDuration = 120;
 
 const ZERO = "0x0000000000000000000000000000000000000000";
 
+const isPositiveInt = (n: number, max: number) => Number.isInteger(n) && n > 0 && n <= max;
+
 /// Issuer step: approve the router to pull shares, then seed the pair with shares + HBAR liquidity.
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!demoConfigured()) return NextResponse.json({ error: "Demo not seeded." }, { status: 400 });
@@ -15,6 +17,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const body = await req.json().catch(() => ({}));
   const shareAmount = Number(body.shares ?? 500_000);
   const hbarAmount = Number(body.hbar ?? 10);
+  // Bound the amounts: reject NaN/negative/absurd values before they reach the issuer's funds.
+  if (!isPositiveInt(shareAmount, 1_000_000_000) || !isPositiveInt(hbarAmount, 10_000)) {
+    return NextResponse.json({ error: "shares and hbar must be positive whole numbers within range" }, { status: 400 });
+  }
 
   const asset = await getAssetView(registryEvm(), assetId).catch(() => null);
   if (!asset || asset.token === ZERO) {

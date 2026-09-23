@@ -36,6 +36,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const body = await req.json().catch(() => ({}));
   const investorIndex = Number(body.investorIndex ?? 0);
   const hbarIn = Number(body.hbar ?? 1);
+  if (!Number.isInteger(hbarIn) || hbarIn <= 0 || hbarIn > 10_000) {
+    return NextResponse.json({ error: "hbar must be a positive whole number within range" }, { status: 400 });
+  }
 
   const keys = demoKeys();
   const investor = keys.investors[investorIndex];
