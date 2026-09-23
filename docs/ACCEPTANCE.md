@@ -56,10 +56,13 @@ routes, each verified over HTTP against the running app (see TESTNET_VERIFICATIO
 
 ## Increment 04 — Documentation and polish
 
-- [x] **1. All previous acceptance passes from a fresh scaffold.** `scripts/gate-check.sh` runs the
-  offline gate with no `.env` and is **GREEN**: secrets gitignored, `yarn install --immutable`, lint,
-  type-check (hedera/nextjs/hardhat), `hardhat:compile`, contract tests, adapter tests, `next:build`.
-  On-chain acceptance is proven separately on testnet (increments 01–03 above).
+- [x] **1. All previous acceptance passes from a fresh scaffold.** Validated in a **pristine tree**
+  (`git archive HEAD` → temp dir: no `.env`, `.demo-keys.json`, `node_modules`, or build artifacts) with
+  a clean `yarn install` and no env: `scripts/gate-check.sh` is **GREEN** — secrets gitignored,
+  `yarn install --immutable`, lint, `hardhat:compile`, type-check (hedera/nextjs/hardhat), contract
+  tests, adapter tests, `next:build`. (Compile runs before the hardhat type-check, which needs the
+  generated typechain types — the fresh-tree run surfaced and fixed that ordering.) On-chain acceptance
+  is proven separately on testnet (increments 01–03 above).
 - [x] **2. A developer with no context reaches a running app using only the README.** README has a
   60-second quickstart (install → env → `deploy:testnet` → `seed:demo` → `next:dev`), prerequisites,
   and an env table; the home page then guides the five-step story.

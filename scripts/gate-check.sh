@@ -41,19 +41,22 @@ step "install (immutable)" yarn install --immutable
 # 3. Lint (next + hardhat).
 step "lint" yarn lint
 
-# 4. Type-check every workspace.
+# 4. Compile contracts FIRST — hardhat's type-check depends on the typechain types this generates,
+#    so on a fresh clone (no artifacts yet) the hardhat type-check must run after compile.
+step "contracts compile" yarn hardhat:compile
+
+# 5. Type-check every workspace.
 step "types: hedera" yarn hedera:check-types
 step "types: nextjs" yarn next:check-types
 step "types: hardhat" yarn hardhat:check-types
 
-# 5. Contracts compile + unit tests (lockup, finalize, guardian-only pause, admin-only approve).
-step "contracts compile" yarn hardhat:compile
+# 6. Contract unit tests (lockup, finalize, guardian-only pause, admin-only approve).
 step "contract tests" yarn hardhat:test
 
-# 6. Attester adapter tests (approve/reject with reasons).
+# 7. Attester adapter tests (approve/reject with reasons).
 step "adapter tests" yarn workspace @sh/hedera test
 
-# 7. Frontend build (all routes, no env needed).
+# 8. Frontend build (all routes, no env needed).
 step "frontend build" yarn next:build
 
 echo "============================="
