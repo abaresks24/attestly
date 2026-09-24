@@ -61,7 +61,7 @@ const AssetDetail: NextPage = () => {
           <span className="opacity-70">{asset.shares} shares</span>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
           <Fact label="Document CID" value={asset.cid} />
           <Fact label="Token" value={asset.tokenId ?? "—"} href={links.token} />
           <Fact label="HCS topic" value={links.topic ? "view" : "—"} href={links.topic} />
@@ -69,7 +69,7 @@ const AssetDetail: NextPage = () => {
         </div>
 
         {schedule && (
-          <div className="stats bg-base-200 mb-6 w-full">
+          <div className="stats stats-vertical sm:stats-horizontal bg-base-200 mb-6 w-full">
             <div className="stat">
               <div className="stat-title">Attester signatures</div>
               <div className="stat-value text-2xl">{schedule.signatures} / 2</div>
@@ -86,18 +86,20 @@ const AssetDetail: NextPage = () => {
         )}
 
         {schedule?.executed && asset.status === "Registered" && (
-          <div className="alert alert-success mb-6">
-            <span>Mint executed. Confirm it to start the lockup.</span>
-            <button className="btn btn-sm" disabled={confirming} onClick={confirmMint}>
+          <div className="alert alert-success mb-6 flex-col sm:flex-row items-start sm:items-center gap-3">
+            <span className="text-sm">Mint executed. Confirm it to start the lockup.</span>
+            <button className="btn btn-sm sm:ml-auto shrink-0" disabled={confirming} onClick={confirmMint}>
               {confirming ? <span className="loading loading-spinner loading-xs" /> : "Confirm mint"}
             </button>
           </div>
         )}
 
         {(asset.status === "Minted" || asset.status === "Finalized") && (
-          <div className="alert mb-6">
-            <span>Open the KYC-gated market: create the pair, verify investors, trade, and run the guardian stop.</span>
-            <Link href={`/assets/${asset.assetId}/market`} className="btn btn-sm btn-primary">
+          <div className="alert mb-6 flex-col sm:flex-row items-start sm:items-center gap-3">
+            <span className="text-sm">
+              Open the KYC-gated market: create the pair, verify investors, trade, and run the guardian stop.
+            </span>
+            <Link href={`/assets/${asset.assetId}/market`} className="btn btn-sm btn-primary sm:ml-auto shrink-0">
               Market →
             </Link>
           </div>
@@ -113,8 +115,10 @@ const AssetDetail: NextPage = () => {
                 {i > 0 && <hr />}
                 <div className="timeline-start text-xs opacity-60">{m.at?.split(".")[0]}</div>
                 <div className="timeline-middle">●</div>
-                <div className="timeline-end mb-4">
-                  <code className="text-xs">{typeof m.entry === "string" ? m.entry : JSON.stringify(m.entry)}</code>
+                <div className="timeline-end mb-4 min-w-0">
+                  <code className="text-xs block bg-base-200 rounded px-2 py-1 break-all whitespace-pre-wrap">
+                    {typeof m.entry === "string" ? m.entry : JSON.stringify(m.entry)}
+                  </code>
                 </div>
                 {i < timeline.length - 1 && <hr />}
               </li>

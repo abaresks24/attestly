@@ -4,7 +4,13 @@ import React, { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bars3Icon, BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import {
+  Bars3Icon,
+  BugAntIcon,
+  CheckBadgeIcon,
+  DocumentTextIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-hbar";
 import { useOutsideClick } from "~~/hooks/scaffold-hbar";
 
@@ -20,12 +26,22 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/",
   },
   {
-    label: "Debug Contracts",
+    label: "Assets",
+    href: "/assets",
+    icon: <DocumentTextIcon className="h-4 w-4" />,
+  },
+  {
+    label: "Attest",
+    href: "/attest",
+    icon: <CheckBadgeIcon className="h-4 w-4" />,
+  },
+  {
+    label: "Debug",
     href: "/debug",
     icon: <BugAntIcon className="h-4 w-4" />,
   },
   {
-    label: "Block Explorer",
+    label: "Explorer",
     href: "/blockexplorer",
     icon: <MagnifyingGlassIcon className="h-4 w-4" />,
   },
@@ -37,7 +53,7 @@ export const HeaderMenuLinks = () => {
   return (
     <>
       {menuLinks.map(({ label, href, icon }) => {
-        const isActive = pathname === href;
+        const isActive = pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
         return (
           <li key={href}>
             <Link
@@ -88,9 +104,9 @@ export const Header = () => {
             <Image alt="Hedera icon" className="cursor-pointer hidden dark:block" fill src="/Hedera-Icon-White.svg" />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold leading-tight text-base">Scaffold-HBAR</span>
+            <span className="font-bold leading-tight text-base">Attestly</span>
             <span className="text-[10px] tracking-wider uppercase text-base-content/50 font-medium">
-              Built on Hedera
+              Attested RWA on Hedera
             </span>
           </div>
         </Link>

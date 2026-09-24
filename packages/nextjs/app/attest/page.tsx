@@ -76,12 +76,15 @@ const Attest: NextPage = () => {
         ) : (
           <div className="space-y-3">
             {assets.map(a => (
-              <div key={a.assetId} className="flex items-center justify-between bg-base-200 rounded-lg p-4">
-                <div>
+              <div
+                key={a.assetId}
+                className="flex items-center justify-between gap-3 flex-wrap bg-base-200 rounded-lg p-4"
+              >
+                <div className="min-w-0">
                   <span className="font-medium">Asset #{a.assetId}</span>
                   <span className="opacity-70 ml-2">{a.shares} shares</span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                   <button
                     className="btn btn-sm btn-success"
                     disabled={busy === a.assetId}

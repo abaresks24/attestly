@@ -136,7 +136,7 @@ const Market: NextPage = () => {
           desc="Create the SaucerSwap V1 pair and grant it KYC, so the pair can hold the token."
         >
           {pair ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="badge badge-success">pair {pair}</span>
               {links.pair && (
                 <a className="link text-sm" href={links.pair} target="_blank" rel="noreferrer">
@@ -190,17 +190,17 @@ const Market: NextPage = () => {
           ) : (
             <div className="space-y-2">
               {investors.map(inv => (
-                <div key={inv.index} className="flex items-center justify-between bg-base-100 rounded-lg p-3">
-                  <div className="text-sm">
+                <div key={inv.index} className="flex items-center justify-between gap-3 bg-base-100 rounded-lg p-3">
+                  <div className="text-sm min-w-0 flex flex-wrap items-baseline gap-x-2">
                     <span className="font-medium">Investor {inv.index + 1}</span>
-                    <span className="opacity-60 ml-2 font-mono">{inv.id}</span>
-                    <span className="opacity-70 ml-2">· {inv.balance} shares</span>
+                    <span className="opacity-60 font-mono break-all">{inv.id}</span>
+                    <span className="opacity-70">· {inv.balance} shares</span>
                   </div>
                   {inv.verified ? (
-                    <span className="badge badge-success">KYC ✓</span>
+                    <span className="badge badge-success shrink-0">KYC ✓</span>
                   ) : (
                     <button
-                      className="btn btn-xs btn-outline"
+                      className="btn btn-xs btn-outline shrink-0"
                       disabled={!configured || busy != null}
                       onClick={() =>
                         run(
