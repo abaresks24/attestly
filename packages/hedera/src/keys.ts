@@ -1,6 +1,6 @@
 // Verifies a token's on-chain key set against expectations, using the mirror node.
 //
-// Gotcha (spikes/REPORT.md): the mirror node returns a ThresholdKey/KeyList as
+// Gotcha (docs/ARCHITECTURE.md): the mirror node returns a ThresholdKey/KeyList as
 // { _type: "ProtobufEncoded", key: <hex> } and does NOT expand the threshold or sub-keys into JSON.
 // We decode that protobuf with @hiero-ledger/proto + Key._fromProtobufKey to assert the threshold,
 // the members, and the absence of an admin key. This backs the template's FR-2 invariant: an asset

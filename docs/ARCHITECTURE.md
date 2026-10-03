@@ -12,7 +12,7 @@ packages/
   nextjs/    App Router UI + server routes for native HAPI operations (Node runtime)
   hedera/    shared typed helpers: client, mirror, keys, schedules, HCS, SaucerSwap, errors, attesters
 mock-registry/  titles.json — the land registry the demo MockRegistryAttester queries
-docs/           ARCHITECTURE.md, ADAPTING.md, TESTNET_VERIFICATION.md, BUILD_PLAN.md, PROTOCOL_VISION.md
+docs/           ARCHITECTURE.md, ADAPTING.md, TESTNET_VERIFICATION.md, ACCEPTANCE.md, PROTOCOL_VISION.md
 template.json   scaffold-hbar manifest (parameters mirrored from config/rwa.ts)
 ```
 
@@ -94,5 +94,28 @@ mint **at the k-th signature and not before** — the quorum is enforced by cons
 ## Graceful degradation
 
 With no env the app still boots: every route returns 200 and the UI shows a configuration notice.
-IPFS pinning is optional (labeled local fallback). This is an invariant — see the increment-01
-acceptance in [ACCEPTANCE.md](./ACCEPTANCE.md).
+IPFS pinning is optional (labeled local fallback). This is an invariant (see `AGENTS.md`).
+
+## Testnet gotchas (learned the hard way)
+
+These shaped the design; if you adapt the template, keep them in mind.
+
+- **HTS wants the *alias* EVM address, not the long-zero.** `grantTokenKyc` and the LP-NFT recipient
+  must be an ECDSA account's alias address (the mirror node's `evm_address`), not the long-zero
+  derived from its `0.0.N` id — the long-zero is rejected (`INVALID_ACCOUNT_ID` / `INVALID_ALIAS_KEY`).
+  Investor-initiated calls use `msg.sender` (already the alias); admin-provided addresses must resolve
+  it. Tokens, by contrast, are referenced by long-zero.
+- **The trading venue is SaucerSwap V1, not V2.** V2 pool creation reverts `PCF` on testnet because
+  `poolCreateFee` is misconfigured to ~$1,000,000 (≈12.8M HBAR) — a SaucerSwap-side testnet issue,
+  unrelated to KYC. V1's `pairCreateFee` is ~$2, so the template pools on V1. Addresses live in
+  `packages/hedera/src/constants.ts`; re-evaluate V2 if the testnet fee is fixed.
+- **SaucerSwap masks the HTS status.** A refused transfer surfaces as `Safe token transfer failed!`
+  from the router's `TransferHelper`; the real code (`ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN` 176,
+  `TOKEN_IS_PAUSED` 265) is only in the mirror's child-action trace. `errors.ts` maps both.
+- **An account must associate the token before it can be KYC-granted.** Auto-association only fires on
+  receipt, and receiving needs KYC — so `enableInvestor` associates explicitly first to break the
+  deadlock.
+- **Testnet consensus nodes return `BUSY`/timeout under load.** The SDK client uses wide retries +
+  backoff, and reads go through the mirror node rather than consensus queries.
+- **On the Hedera EVM, `msg.value` and `address(this).balance` are in tinybars** (1e8/HBAR), not
+  weibars; the relay divides the ethers `value` (weibar) by 1e10 before the call.

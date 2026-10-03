@@ -1,7 +1,20 @@
 # Testnet verification
 
-On-chain evidence for the acceptance criteria. Network: Hedera **testnet** (chain 296).
-Operator `0.0.10667593` (ECDSA). Deeper feasibility evidence is in `spikes/REPORT.md`.
+On-chain evidence that the template's Hedera services work. Network: Hedera **testnet** (chain 296).
+
+## Current deployment
+
+| Contract | Address | Link |
+|---|---|---|
+| AssetRegistry | `0xB461DD05E0E5C803ac11110E51A9DdCAd0c0Ab62` | [HashScan](https://hashscan.io/testnet/contract/0xB461DD05E0E5C803ac11110E51A9DdCAd0c0Ab62) |
+| InvestorRegistry | `0xbcB2237B6FB03390bDEC0b0A58998472563fE48b` | [HashScan](https://hashscan.io/testnet/contract/0xbcB2237B6FB03390bDEC0b0A58998472563fE48b) |
+
+Headline transaction (a verified investor buying KYC-gated shares on SaucerSwap V1):
+[`0x6addabe8…87be2`](https://hashscan.io/testnet/transaction/0x6addabe8006301a56aaf16cb4078cd904758f515f7fe660fe6cbe47294c87be2).
+
+Reproduce any of the runs below with the `demo-*.ts` scripts in `packages/hedera/src` (operator env +
+`yarn seed:demo` required). The sections are organized by increment; earlier increments reference an
+earlier registry deployment, since the contracts were redeployed when the demo lockup was shortened.
 
 ## Increment 01 — Foundation
 

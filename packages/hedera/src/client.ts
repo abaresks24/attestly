@@ -1,5 +1,5 @@
 // Testnet SDK client + operator loading. Resilient to the BUSY / timeout responses testnet
-// consensus nodes return under load (see spikes/REPORT.md).
+// consensus nodes return under load (see "Testnet gotchas" in docs/ARCHITECTURE.md).
 import { AccountId, Client, PrivateKey } from "@hiero-ledger/sdk";
 
 export interface Operator {

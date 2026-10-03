@@ -164,8 +164,8 @@ This template makes its trust boundaries explicit so you can decide what to hard
   HIP-755) with no private keys on the server. The on-chain invariants (KYC gating, quorum mint,
   guardian threshold) hold regardless of who calls the routes — the network enforces them.
 - **Venue is SaucerSwap V1 on testnet.** V2 pool creation is blocked on testnet by a misconfigured
-  `poolCreateFee`; the venue is a config seam (`packages/hedera/src/constants.ts`). See
-  [BUILD_PLAN.md](docs/BUILD_PLAN.md) G1.
+  `poolCreateFee`; the venue is a config seam (`packages/hedera/src/constants.ts`). See the
+  [testnet gotchas](docs/ARCHITECTURE.md#testnet-gotchas-learned-the-hard-way).
 
 ## Disclaimer
 

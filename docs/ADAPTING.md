@@ -45,7 +45,7 @@ what actually signs the scheduled mint. Real attesters each hold one share of th
 ## 3. Change the trading pair / venue
 
 The venue is a config seam. The demo uses **SaucerSwap V1** (V2 pool creation is blocked on testnet —
-see [BUILD_PLAN.md](./BUILD_PLAN.md) G1).
+see the [testnet gotchas](./ARCHITECTURE.md#testnet-gotchas-learned-the-hard-way)).
 
 - **Addresses:** `packages/hedera/src/constants.ts` — `SAUCERSWAP_V1 = { factory, router, whbarToken }`.
   Point these at another UniswapV2-style venue, or a V2 deployment once testnet is fixed.
@@ -55,7 +55,7 @@ see [BUILD_PLAN.md](./BUILD_PLAN.md) G1).
   (grant KYC to whatever contract must hold the token).
 - **What KYC is granted to:** `finalizeAsset(...)` grants KYC to the **pair only** — the minimal set
   (the router never holds the token). If your venue holds the token in a different contract, grant KYC
-  there instead. See [BUILD_PLAN.md](./BUILD_PLAN.md) G2.
+  there instead.
 - **Readable errors:** `packages/hedera/src/errors.ts` maps HTS codes and the SaucerSwap
   `"Safe token transfer failed!"` wrapper. Add your venue's revert strings there so the UI keeps
   explaining refusals in plain language.

@@ -17,7 +17,7 @@ packages/hardhat/   AssetRegistry.sol, InvestorRegistry.sol, interfaces/, test/,
 packages/nextjs/    App Router UI + /app/api server routes (Node runtime) for native HAPI ops
 packages/hedera/    @sh/hedera — client, mirror, keys, schedules, market, errors, attesters/, demo-*.ts
 mock-registry/      titles.json for the demo MockRegistryAttester
-docs/               ARCHITECTURE, ADAPTING, ACCEPTANCE, TESTNET_VERIFICATION, BUILD_PLAN, PROTOCOL_VISION
+docs/               ARCHITECTURE, ADAPTING, TESTNET_VERIFICATION, PROTOCOL_VISION
 scripts/gate-check.sh   offline eligibility gate (install, lint, types, tests, build)
 ```
 

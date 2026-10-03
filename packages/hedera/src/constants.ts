@@ -1,6 +1,6 @@
 // Hedera testnet endpoints and the addresses this template depends on.
-// SaucerSwap venue is V1 (see docs/BUILD_PLAN.md G1: V2 pool creation is blocked on testnet by a
-// misconfigured poolCreateFee). Sources are recorded in spikes/findings.json.
+// SaucerSwap venue is V1 (see docs/ARCHITECTURE.md "Testnet gotchas": V2 pool creation is blocked by a
+// misconfigured poolCreateFee — see "Testnet gotchas" in docs/ARCHITECTURE.md).
 
 export const TESTNET = {
   mirror: "https://testnet.mirrornode.hedera.com/api/v1",
